@@ -3,7 +3,6 @@
 ## Future features
 
 - **This day in the Revolution**: historical events keyed to Republican dates (18 Brumaire for Napoleon's coup, 9 Thermidor for the fall of Robespierre, 13 Vendémiaire for the whiff of grapeshot...). Show a "ce jour-là" line in the day popover and on the almanac month pages.
-- **Desktop widget**: WidgetKit widget with the 10-hour dial or today's Republican date. Needs an app group if it shares settings with the app.
 - **Decimal hour chime**: a soft bell at each new decimal hour (every 2h24 of old time), maybe something grander at decimal noon (5:00). Needs a setting to turn it off.
 - **Engravings**: public domain illustrations for the 366 rural day names, sourced from Wikimedia Commons (the original almanacs were illustrated). Show them in the day popover and almanac. Biggest effort of the four since each image has to be found and credited.
 
@@ -15,6 +14,7 @@
 - [x] French/English mode
 - [x] Click any day for its old-style date
 - [x] Date converter, both directions (in the almanac)
+- [x] Widget for Notification Center and desktop (small: date + decimal time, medium: adds the dial). Follows the system language since there is no app group; updates once per decimal minute.
 
 ## Other ideas
 

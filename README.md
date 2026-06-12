@@ -14,6 +14,7 @@ In 1793 the National Convention decreed that the day would have 10 hours, each h
 - A date and time converter in both directions, for deciphering revolutionary documents or finding your Republican birthday
 - Click any day for its old-style (Gregorian) date
 - French or English interface, toggle anywhere
+- A widget for the Notification Center sidebar and the desktop (the medium size includes the dial). Add it via Edit Widgets after launching the app once
 - Conventional time at the bottom, for the unconverted
 
 ## Building
