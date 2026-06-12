@@ -16,9 +16,14 @@ swiftc -O -parse-as-library Sources/*.swift -o "$APP/Contents/MacOS/HorlogeRepub
 cp Info.plist "$APP/Contents/Info.plist"
 
 # The widget shares the calendar logic and theme but has its own @main.
+# Entry point must be Foundation's _NSExtensionMain (what Xcode links app
+# extensions with); with Swift's default main the process exits before
+# serving XPC and the widget never appears in the gallery.
 swiftc -O -parse-as-library -target arm64-apple-macos14.0 \
     Sources/CalendarData.swift Sources/RepublicanCalendar.swift Sources/Theme.swift \
     Widget/HorlogeWidget.swift \
+    -framework Foundation \
+    -Xlinker -e -Xlinker _NSExtensionMain \
     -o "$APPEX/Contents/MacOS/HorlogeWidget"
 cp Widget/Info.plist "$APPEX/Contents/Info.plist"
 
