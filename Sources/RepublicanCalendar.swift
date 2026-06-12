@@ -69,6 +69,19 @@ enum RepublicanCalendar {
         )
     }
 
+    // Reverse conversion: a Republican date to its Gregorian equivalent.
+    static func gregorianDate(year: Int, month: Int, day: Int, calendar: Calendar = .current) -> Date? {
+        guard year >= 1, let start = anniversary(of: 1791 + year, calendar: calendar) else { return nil }
+        let offset = month == 12 ? 360 + day - 1 : month * 30 + day - 1
+        return calendar.date(byAdding: .day, value: offset, to: start)
+    }
+
+    static func isLeapRepublicanYear(_ year: Int, calendar: Calendar = .current) -> Bool {
+        guard let start = anniversary(of: 1791 + year, calendar: calendar),
+              let next = anniversary(of: 1792 + year, calendar: calendar) else { return false }
+        return calendar.dateComponents([.day], from: start, to: next).day == 366
+    }
+
     static func roman(_ number: Int) -> String {
         let values = [
             (1000, "M"), (900, "CM"), (500, "D"), (400, "CD"),

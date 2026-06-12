@@ -8,6 +8,7 @@ struct AlmanachView: View {
         case decade
         case month(Int)
         case complementary
+        case converter
     }
 
     @AppStorage("language") private var languageRaw = Language.fr.rawValue
@@ -22,6 +23,7 @@ struct AlmanachView: View {
                     Text(tr(lang, "Le système", "The system")).tag(Page.system)
                     Text(tr(lang, "La décade", "The décade")).tag(Page.decade)
                     Text("Sans-culottides").tag(Page.complementary)
+                    Text(tr(lang, "Le convertisseur", "The converter")).tag(Page.converter)
                 }
                 Section(tr(lang, "Les mois", "The months")) {
                     ForEach(0..<12, id: \.self) { m in
@@ -45,6 +47,7 @@ struct AlmanachView: View {
                     case .decade: DecadePage(lang: lang)
                     case .month(let m): MonthPage(lang: lang, month: m)
                     case .complementary: ComplementaryPage(lang: lang)
+                    case .converter: ConverterPage(lang: lang)
                     }
                 }
                 .frame(maxWidth: 560, alignment: .leading)
@@ -336,6 +339,185 @@ private struct MonthPage: View {
                 RoundedRectangle(cornerRadius: 6)
                     .stroke(Theme.gold.opacity(0.6), lineWidth: 1)
             )
+        }
+    }
+}
+
+private struct ConverterPage: View {
+    let lang: Language
+    @State private var gregorianInput: Date
+    @State private var repYear: Int
+    @State private var repMonth: Int
+    @State private var repDay: Int
+
+    init(lang: Language) {
+        self.lang = lang
+        let today = RepublicanCalendar.date(from: Date())
+        _gregorianInput = State(initialValue: Date())
+        _repYear = State(initialValue: today.year)
+        _repMonth = State(initialValue: today.month)
+        _repDay = State(initialValue: today.day)
+    }
+
+    private static let fullFR: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "fr_FR")
+        f.dateStyle = .full
+        return f
+    }()
+
+    private static let fullEN: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US")
+        f.dateStyle = .full
+        return f
+    }()
+
+    private var formatter: DateFormatter { lang == .fr ? Self.fullFR : Self.fullEN }
+
+    private var maxDay: Int {
+        repMonth == 12 ? (RepublicanCalendar.isLeapRepublicanYear(repYear) ? 6 : 5) : 30
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            PageTitle(
+                tr(lang, "Le convertisseur", "The converter"),
+                subtitle: tr(lang, "d'un calendrier à l'autre", "from one calendar to the other")
+            )
+
+            Prose(tr(lang,
+                """
+                Les documents de la Révolution sont tous datés en style \
+                républicain. Voici de quoi les déchiffrer, et de quoi savoir \
+                quel jour vous êtes né dans le calendrier de la République.
+                """,
+                """
+                Documents from the Revolution are all dated in Republican style. \
+                Here is how to decipher them, and how to find out what day you \
+                were born on in the calendar of the Republic.
+                """))
+
+            converterPanel(title: tr(lang, "Ancien style → républicain", "Old style → Republican")) {
+                DatePicker("", selection: $gregorianInput, displayedComponents: .date)
+                    .datePickerStyle(.field)
+                    .labelsHidden()
+                    .environment(\.locale, Locale(identifier: lang == .fr ? "fr_FR" : "en_US"))
+                    .frame(maxWidth: 200)
+
+                gregorianToRepublicanResult
+            }
+
+            converterPanel(title: tr(lang, "Républicain → ancien style", "Republican → old style")) {
+                HStack(spacing: 8) {
+                    Picker("", selection: $repDay) {
+                        ForEach(1...maxDay, id: \.self) { d in
+                            Text("\(d)").tag(d)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 64)
+
+                    Picker("", selection: $repMonth) {
+                        ForEach(0..<12, id: \.self) { m in
+                            Text(RepublicanData.months[m]).tag(m)
+                        }
+                        Text("Sans-culottides").tag(12)
+                    }
+                    .labelsHidden()
+                    .frame(width: 150)
+
+                    Stepper(value: $repYear, in: 1...3000) {
+                        Text("An \(RepublicanCalendar.roman(repYear))")
+                            .font(.system(size: 13, design: .serif))
+                            .foregroundStyle(Theme.ink)
+                    }
+                }
+                .onChange(of: repMonth) { _ in
+                    repDay = min(repDay, maxDay)
+                }
+                .onChange(of: repYear) { _ in
+                    repDay = min(repDay, maxDay)
+                }
+
+                republicanToGregorianResult
+            }
+        }
+    }
+
+    private func converterPanel<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.system(size: 12, weight: .semibold, design: .serif))
+                .kerning(1)
+                .foregroundStyle(Theme.gold)
+            content()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Theme.gold.opacity(0.6), lineWidth: 1)
+        )
+    }
+
+    @ViewBuilder
+    private var gregorianToRepublicanResult: some View {
+        let rep = RepublicanCalendar.date(from: gregorianInput)
+        if rep.year < 1 {
+            Text(tr(lang,
+                    "C'est avant la République ! Le calendrier commence le 22 septembre 1792.",
+                    "That is before the Republic! The calendar starts on September 22, 1792."))
+                .font(.system(size: 13, design: .serif).italic())
+                .foregroundStyle(Theme.red)
+        } else {
+            VStack(alignment: .leading, spacing: 2) {
+                if rep.isComplementary {
+                    Text("\(RepublicanData.complementaryDays[rep.day - 1]) · An \(RepublicanCalendar.roman(rep.year))")
+                        .font(.system(size: 15, weight: .semibold, design: .serif))
+                        .foregroundStyle(Theme.blue)
+                    if lang == .en {
+                        Text(RepublicanData.complementaryDaysEN[rep.day - 1])
+                            .font(.system(size: 12, design: .serif).italic())
+                            .foregroundStyle(Theme.red)
+                    }
+                } else {
+                    Text("\(rep.decadeDayName) \(rep.day) \(RepublicanData.months[rep.month]) · An \(RepublicanCalendar.roman(rep.year))")
+                        .font(.system(size: 15, weight: .semibold, design: .serif))
+                        .foregroundStyle(Theme.blue)
+                    if let rural = rep.ruralDayName {
+                        Text(lang == .fr
+                             ? "✿ \(rural)"
+                             : "✿ \(RepublicanData.ruralDaysEN[rep.month * 30 + rep.day - 1]) · \(rural)")
+                            .font(.system(size: 12, design: .serif).italic())
+                            .foregroundStyle(Theme.red)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var republicanToGregorianResult: some View {
+        if let date = RepublicanCalendar.gregorianDate(year: repYear, month: repMonth, day: repDay) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(formatter.string(from: date))
+                    .font(.system(size: 15, weight: .semibold, design: .serif))
+                    .foregroundStyle(Theme.blue)
+                if repMonth == 12 {
+                    Text(lang == .fr
+                         ? RepublicanData.complementaryDays[repDay - 1]
+                         : RepublicanData.complementaryDaysEN[repDay - 1])
+                        .font(.system(size: 12, design: .serif).italic())
+                        .foregroundStyle(Theme.red)
+                } else {
+                    Text(lang == .fr
+                         ? "✿ \(RepublicanData.ruralDays[repMonth * 30 + repDay - 1])"
+                         : "✿ \(RepublicanData.ruralDaysEN[repMonth * 30 + repDay - 1]) · \(RepublicanData.ruralDays[repMonth * 30 + repDay - 1])")
+                        .font(.system(size: 12, design: .serif).italic())
+                        .foregroundStyle(Theme.red)
+                }
+            }
         }
     }
 }
