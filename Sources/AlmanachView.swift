@@ -345,19 +345,46 @@ private struct MonthPage: View {
 
 private struct ConverterPage: View {
     let lang: Language
-    @State private var gregorianInput: Date
+    @State private var gregDay: Int
+    @State private var gregMonth: Int  // 1-12
+    @State private var gregYear: Int
     @State private var repYear: Int
     @State private var repMonth: Int
     @State private var repDay: Int
+    @State private var oldHour: Int
+    @State private var oldMinute: Int
+    @State private var decHour: Int
+    @State private var decMinute: Int
 
     init(lang: Language) {
         self.lang = lang
-        let today = RepublicanCalendar.date(from: Date())
-        _gregorianInput = State(initialValue: Date())
+        let now = Date()
+        let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: now)
+        let today = RepublicanCalendar.date(from: now)
+        let dec = RepublicanCalendar.decimalTime(for: now)
+        _gregDay = State(initialValue: comps.day!)
+        _gregMonth = State(initialValue: comps.month!)
+        _gregYear = State(initialValue: comps.year!)
         _repYear = State(initialValue: today.year)
         _repMonth = State(initialValue: today.month)
         _repDay = State(initialValue: today.day)
+        _oldHour = State(initialValue: comps.hour!)
+        _oldMinute = State(initialValue: comps.minute!)
+        _decHour = State(initialValue: dec.hours)
+        _decMinute = State(initialValue: dec.minutes)
     }
+
+    private static let monthSymbolsFR: [String] = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "fr_FR")
+        return f.monthSymbols
+    }()
+
+    private static let monthSymbolsEN: [String] = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US")
+        return f.monthSymbols
+    }()
 
     private static let fullFR: DateFormatter = {
         let f = DateFormatter()
@@ -377,6 +404,19 @@ private struct ConverterPage: View {
 
     private var maxDay: Int {
         repMonth == 12 ? (RepublicanCalendar.isLeapRepublicanYear(repYear) ? 6 : 5) : 30
+    }
+
+    private var gregMaxDay: Int {
+        let calendar = Calendar.current
+        let anchor = calendar.date(from: DateComponents(year: gregYear, month: gregMonth))!
+        return calendar.range(of: .day, in: .month, for: anchor)!.count
+    }
+
+    // Noon, so DST shifts can't nudge the day.
+    private var gregorianInput: Date {
+        Calendar.current.date(from: DateComponents(
+            year: gregYear, month: gregMonth, day: min(gregDay, gregMaxDay), hour: 12
+        ))!
     }
 
     var body: some View {
@@ -399,11 +439,35 @@ private struct ConverterPage: View {
                 """))
 
             converterPanel(title: tr(lang, "Ancien style → républicain", "Old style → Republican")) {
-                DatePicker("", selection: $gregorianInput, displayedComponents: .date)
-                    .datePickerStyle(.field)
+                HStack(spacing: 8) {
+                    Picker("", selection: $gregDay) {
+                        ForEach(1...gregMaxDay, id: \.self) { d in
+                            Text("\(d)").tag(d)
+                        }
+                    }
                     .labelsHidden()
-                    .environment(\.locale, Locale(identifier: lang == .fr ? "fr_FR" : "en_US"))
-                    .frame(maxWidth: 200)
+                    .frame(width: 64)
+
+                    Picker("", selection: $gregMonth) {
+                        ForEach(1...12, id: \.self) { m in
+                            Text((lang == .fr ? Self.monthSymbolsFR : Self.monthSymbolsEN)[m - 1]).tag(m)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 150)
+
+                    Stepper(value: $gregYear, in: 1792...3000) {
+                        Text(String(gregYear))
+                            .font(.system(size: 13, design: .serif))
+                            .foregroundStyle(Theme.ink)
+                    }
+                }
+                .onChange(of: gregMonth) { _ in
+                    gregDay = min(gregDay, gregMaxDay)
+                }
+                .onChange(of: gregYear) { _ in
+                    gregDay = min(gregDay, gregMaxDay)
+                }
 
                 gregorianToRepublicanResult
             }
@@ -442,6 +506,94 @@ private struct ConverterPage: View {
 
                 republicanToGregorianResult
             }
+
+            converterPanel(title: tr(lang, "Ancienne heure → décimale", "Old time → decimal")) {
+                HStack(spacing: 8) {
+                    Picker("", selection: $oldHour) {
+                        ForEach(0..<24, id: \.self) { h in
+                            Text(String(format: "%02d", h)).tag(h)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 70)
+
+                    Text("h")
+                        .font(.system(size: 13, design: .serif))
+                        .foregroundStyle(Theme.faded)
+
+                    Picker("", selection: $oldMinute) {
+                        ForEach(0..<60, id: \.self) { m in
+                            Text(String(format: "%02d", m)).tag(m)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 70)
+
+                    Text("min")
+                        .font(.system(size: 13, design: .serif))
+                        .foregroundStyle(Theme.faded)
+                }
+
+                timeResult(
+                    String(format: "%d:%02d:%02d", decimalFromOld.0, decimalFromOld.1, decimalFromOld.2),
+                    caption: tr(lang, "heure décimale", "decimal time")
+                )
+            }
+
+            converterPanel(title: tr(lang, "Heure décimale → ancienne", "Decimal time → old")) {
+                HStack(spacing: 8) {
+                    Picker("", selection: $decHour) {
+                        ForEach(0..<10, id: \.self) { h in
+                            Text("\(h)").tag(h)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 64)
+
+                    Text("h")
+                        .font(.system(size: 13, design: .serif))
+                        .foregroundStyle(Theme.faded)
+
+                    Picker("", selection: $decMinute) {
+                        ForEach(0..<100, id: \.self) { m in
+                            Text(String(format: "%02d", m)).tag(m)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 70)
+
+                    Text("min")
+                        .font(.system(size: 13, design: .serif))
+                        .foregroundStyle(Theme.faded)
+                }
+
+                timeResult(
+                    String(format: "%02d:%02d:%02d", oldFromDecimal.0, oldFromDecimal.1, oldFromDecimal.2),
+                    caption: tr(lang, "heure ancienne", "old-style time")
+                )
+            }
+        }
+    }
+
+    // 24 h × 60 min map onto 10 h × 100 min × 100 s of the same day.
+    private var decimalFromOld: (Int, Int, Int) {
+        let total = Int((Double(oldHour * 3600 + oldMinute * 60) / 86400 * 100_000).rounded()) % 100_000
+        return (total / 10_000, (total / 100) % 100, total % 100)
+    }
+
+    private var oldFromDecimal: (Int, Int, Int) {
+        let seconds = Int((Double(decHour * 10_000 + decMinute * 100) / 100_000 * 86400).rounded()) % 86400
+        return (seconds / 3600, (seconds / 60) % 60, seconds % 60)
+    }
+
+    private func timeResult(_ value: String, caption: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value)
+                .font(.system(size: 15, weight: .semibold, design: .serif).monospacedDigit())
+                .foregroundStyle(Theme.blue)
+            Text(caption)
+                .font(.system(size: 12, design: .serif).italic())
+                .foregroundStyle(Theme.faded)
         }
     }
 
