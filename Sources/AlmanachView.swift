@@ -54,6 +54,7 @@ struct AlmanachView: View {
             .background(Theme.parchment)
         }
         .frame(minWidth: 700, minHeight: 480)
+        .preferredColorScheme(.light)
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 Picker("", selection: $languageRaw) {
@@ -261,6 +262,7 @@ private struct DecadePage: View {
 private struct MonthPage: View {
     let lang: Language
     let month: Int
+    @State private var selectedDay: Int? = nil
 
     var body: some View {
         let rep = RepublicanCalendar.date(from: Date())
@@ -293,23 +295,35 @@ private struct MonthPage: View {
             VStack(spacing: 0) {
                 ForEach(1...30, id: \.self) { day in
                     let isToday = month == rep.month && day == rep.day
-                    HStack(spacing: 10) {
-                        Text("\(day)")
-                            .font(.system(size: 12, weight: .bold, design: .serif).monospacedDigit())
-                            .foregroundStyle(isToday ? .white : Theme.faded)
-                            .frame(width: 22, height: 20)
-                            .background(Circle().fill(isToday ? Theme.red : .clear))
-                        Text(RepublicanData.decadeDays[(day - 1) % 10])
-                            .font(.system(size: 12, design: .serif))
-                            .foregroundStyle(Theme.faded)
-                            .frame(width: 64, alignment: .leading)
-                        Text(RepublicanData.ruralDays[month * 30 + day - 1])
-                            .font(.system(size: 13, weight: isToday ? .semibold : .regular, design: .serif))
-                            .foregroundStyle(isToday ? Theme.red : Theme.ink)
-                        Spacer()
-                        Text(RepublicanData.ruralDaysEN[month * 30 + day - 1])
-                            .font(.system(size: 12, design: .serif).italic())
-                            .foregroundStyle(Theme.faded)
+                    Button {
+                        selectedDay = day
+                    } label: {
+                        HStack(spacing: 10) {
+                            Text("\(day)")
+                                .font(.system(size: 12, weight: .bold, design: .serif).monospacedDigit())
+                                .foregroundStyle(isToday ? .white : Theme.faded)
+                                .frame(width: 22, height: 20)
+                                .background(Circle().fill(isToday ? Theme.red : .clear))
+                            Text(RepublicanData.decadeDays[(day - 1) % 10])
+                                .font(.system(size: 12, design: .serif))
+                                .foregroundStyle(Theme.faded)
+                                .frame(width: 64, alignment: .leading)
+                            Text(RepublicanData.ruralDays[month * 30 + day - 1])
+                                .font(.system(size: 13, weight: isToday ? .semibold : .regular, design: .serif))
+                                .foregroundStyle(isToday ? Theme.red : Theme.ink)
+                            Spacer()
+                            Text(RepublicanData.ruralDaysEN[month * 30 + day - 1])
+                                .font(.system(size: 12, design: .serif).italic())
+                                .foregroundStyle(Theme.faded)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .popover(isPresented: Binding(
+                        get: { selectedDay == day },
+                        set: { if !$0 { selectedDay = nil } }
+                    )) {
+                        DayInfoPopover(lang: lang, rep: rep, month: month, day: day)
                     }
                     .padding(.vertical, 3)
                     if day % 10 == 0 && day < 30 {
@@ -328,6 +342,7 @@ private struct MonthPage: View {
 
 private struct ComplementaryPage: View {
     let lang: Language
+    @State private var selectedDay: Int? = nil
 
     var body: some View {
         let rep = RepublicanCalendar.date(from: Date())
@@ -356,24 +371,36 @@ private struct ComplementaryPage: View {
             VStack(spacing: 0) {
                 ForEach(1...6, id: \.self) { day in
                     let isToday = rep.isComplementary && day == rep.day
-                    HStack(spacing: 10) {
-                        Text("\(day)")
-                            .font(.system(size: 12, weight: .bold, design: .serif))
-                            .foregroundStyle(isToday ? .white : Theme.faded)
-                            .frame(width: 22, height: 20)
-                            .background(Circle().fill(isToday ? Theme.red : .clear))
-                        Text(RepublicanData.complementaryDays[day - 1])
-                            .font(.system(size: 13, weight: isToday ? .semibold : .regular, design: .serif))
-                            .foregroundStyle(isToday ? Theme.red : Theme.ink)
-                        Spacer()
-                        Text(RepublicanData.complementaryDaysEN[day - 1])
-                            .font(.system(size: 12, design: .serif).italic())
-                            .foregroundStyle(Theme.faded)
-                        if day == 6 {
-                            Text(tr(lang, "années sextiles seulement", "leap years only"))
-                                .font(.system(size: 11, design: .serif))
-                                .foregroundStyle(Theme.red)
+                    Button {
+                        selectedDay = day
+                    } label: {
+                        HStack(spacing: 10) {
+                            Text("\(day)")
+                                .font(.system(size: 12, weight: .bold, design: .serif))
+                                .foregroundStyle(isToday ? .white : Theme.faded)
+                                .frame(width: 22, height: 20)
+                                .background(Circle().fill(isToday ? Theme.red : .clear))
+                            Text(RepublicanData.complementaryDays[day - 1])
+                                .font(.system(size: 13, weight: isToday ? .semibold : .regular, design: .serif))
+                                .foregroundStyle(isToday ? Theme.red : Theme.ink)
+                            Spacer()
+                            Text(RepublicanData.complementaryDaysEN[day - 1])
+                                .font(.system(size: 12, design: .serif).italic())
+                                .foregroundStyle(Theme.faded)
+                            if day == 6 {
+                                Text(tr(lang, "années sextiles seulement", "leap years only"))
+                                    .font(.system(size: 11, design: .serif))
+                                    .foregroundStyle(Theme.red)
+                            }
                         }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .popover(isPresented: Binding(
+                        get: { selectedDay == day },
+                        set: { if !$0 { selectedDay = nil } }
+                    )) {
+                        DayInfoPopover(lang: lang, rep: rep, month: 12, day: day)
                     }
                     .padding(.vertical, 5)
                     if day < 6 {

@@ -49,6 +49,85 @@ enum Theme {
     static let faded = Color(red: 0.45, green: 0.42, blue: 0.36)
 }
 
+// Self-colored button so it stays readable on parchment even when the
+// system is in dark mode (menu bar panels ignore preferredColorScheme).
+struct RevolutionButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 12, design: .serif))
+            .foregroundStyle(Theme.ink)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(
+                RoundedRectangle(cornerRadius: 5)
+                    .fill(configuration.isPressed ? Theme.gold.opacity(0.35) : Color.white.opacity(0.65))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Theme.gold.opacity(0.7), lineWidth: 1)
+            )
+    }
+}
+
+// Shown when clicking a day: the Republican date and its old-style
+// equivalent for the current Republican year.
+struct DayInfoPopover: View {
+    let lang: Language
+    let rep: RepublicanDate  // today, for year context
+    let month: Int           // 0-11, or 12 for the complementary days
+    let day: Int
+
+    private static let fullFR: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "fr_FR")
+        f.dateStyle = .full
+        return f
+    }()
+
+    private static let fullEN: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US")
+        f.dateStyle = .full
+        return f
+    }()
+
+    var body: some View {
+        let offset = month == 12 ? 360 + day - 1 : month * 30 + day - 1
+        let gregorian = Calendar.current.date(byAdding: .day, value: offset, to: rep.yearStart)!
+        let formatter = lang == .fr ? Self.fullFR : Self.fullEN
+
+        VStack(spacing: 5) {
+            if month == 12 {
+                Text("\(RepublicanData.complementaryDays[day - 1]) · An \(RepublicanCalendar.roman(rep.year))")
+                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .foregroundStyle(Theme.ink)
+                if lang == .en {
+                    Text(RepublicanData.complementaryDaysEN[day - 1])
+                        .font(.system(size: 11, design: .serif).italic())
+                        .foregroundStyle(Theme.red)
+                }
+            } else {
+                Text("\(RepublicanData.decadeDays[(day - 1) % 10]) \(day) \(RepublicanData.months[month]) · An \(RepublicanCalendar.roman(rep.year))")
+                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .foregroundStyle(Theme.ink)
+                Text(lang == .fr
+                     ? "✿ \(RepublicanData.ruralDays[month * 30 + day - 1])"
+                     : "✿ \(RepublicanData.ruralDaysEN[month * 30 + day - 1]) · \(RepublicanData.ruralDays[month * 30 + day - 1])")
+                    .font(.system(size: 11, design: .serif).italic())
+                    .foregroundStyle(Theme.red)
+            }
+
+            Divider()
+
+            Text(tr(lang, "ancien style : ", "old style: ") + formatter.string(from: gregorian))
+                .font(.system(size: 12, design: .serif))
+                .foregroundStyle(Theme.faded)
+        }
+        .padding(12)
+        .background(Theme.parchment)
+    }
+}
+
 // MARK: - Menu bar
 
 struct MenuBarLabel: View {
@@ -114,10 +193,11 @@ struct MenuBarPopover: View {
                     NSApplication.shared.terminate(nil)
                 }
             }
-            .controlSize(.small)
+            .buttonStyle(RevolutionButtonStyle())
         }
         .padding(14)
         .background(Theme.parchment)
+        .preferredColorScheme(.light)
         .onReceive(timer) { now = $0 }
     }
 }
@@ -212,6 +292,9 @@ struct ContentView: View {
         }
         .background(Theme.parchment)
         .fixedSize()
+        // The parchment background is light no matter what, so force light
+        // appearance or dark mode draws the controls in white-on-white.
+        .preferredColorScheme(.light)
         .onReceive(timer) { now = $0 }
     }
 }
@@ -264,6 +347,7 @@ struct CalendarPanel: View {
     let rep: RepublicanDate
     let lang: Language
     @Binding var browsedMonth: Int?
+    @State private var selectedDay: Int? = nil
 
     private var displayed: Int { browsedMonth ?? rep.month }
 
@@ -327,6 +411,7 @@ struct CalendarPanel: View {
         Button {
             let next = (displayed + step + 13) % 13
             browsedMonth = next == rep.month ? nil : next
+            selectedDay = nil
         } label: {
             Image(systemName: icon)
                 .font(.system(size: 12, weight: .semibold))
@@ -369,13 +454,24 @@ struct CalendarPanel: View {
             ForEach(1...30, id: \.self) { day in
                 let rural = RepublicanData.ruralDays[displayed * 30 + day - 1]
                 let ruralEN = RepublicanData.ruralDaysEN[displayed * 30 + day - 1]
-                DayCell(
-                    day: day,
-                    isToday: displayed == rep.month && day == rep.day,
-                    tooltip: lang == .fr
-                        ? "\(RepublicanData.decadeDays[(day - 1) % 10]) \(day) · \(rural)"
-                        : "\(RepublicanData.decadeDays[(day - 1) % 10]) \(day) · \(ruralEN) (\(rural))"
-                )
+                Button {
+                    selectedDay = day
+                } label: {
+                    DayCell(
+                        day: day,
+                        isToday: displayed == rep.month && day == rep.day,
+                        tooltip: lang == .fr
+                            ? "\(RepublicanData.decadeDays[(day - 1) % 10]) \(day) · \(rural)"
+                            : "\(RepublicanData.decadeDays[(day - 1) % 10]) \(day) · \(ruralEN) (\(rural))"
+                    )
+                }
+                .buttonStyle(.plain)
+                .popover(isPresented: Binding(
+                    get: { selectedDay == day },
+                    set: { if !$0 { selectedDay = nil } }
+                )) {
+                    DayInfoPopover(lang: lang, rep: rep, month: displayed, day: day)
+                }
             }
         }
     }
@@ -385,17 +481,28 @@ struct CalendarPanel: View {
         return VStack(alignment: .leading, spacing: 4) {
             ForEach(1...count, id: \.self) { day in
                 let isToday = rep.isComplementary && day == rep.day
-                HStack(spacing: 8) {
-                    Text("\(day)")
-                        .font(.system(size: 12, weight: .bold, design: .serif))
-                        .frame(width: 16)
-                        .foregroundStyle(isToday ? .white : Theme.ink)
-                        .background(Circle().fill(isToday ? Theme.red : .clear).frame(width: 20, height: 20))
-                    Text(lang == .fr
-                         ? RepublicanData.complementaryDays[day - 1]
-                         : "\(RepublicanData.complementaryDaysEN[day - 1]) · \(RepublicanData.complementaryDays[day - 1])")
-                        .font(.system(size: 13, design: .serif))
-                        .foregroundStyle(isToday ? Theme.red : Theme.ink)
+                Button {
+                    selectedDay = day
+                } label: {
+                    HStack(spacing: 8) {
+                        Text("\(day)")
+                            .font(.system(size: 12, weight: .bold, design: .serif))
+                            .frame(width: 16)
+                            .foregroundStyle(isToday ? .white : Theme.ink)
+                            .background(Circle().fill(isToday ? Theme.red : .clear).frame(width: 20, height: 20))
+                        Text(lang == .fr
+                             ? RepublicanData.complementaryDays[day - 1]
+                             : "\(RepublicanData.complementaryDaysEN[day - 1]) · \(RepublicanData.complementaryDays[day - 1])")
+                            .font(.system(size: 13, design: .serif))
+                            .foregroundStyle(isToday ? Theme.red : Theme.ink)
+                    }
+                }
+                .buttonStyle(.plain)
+                .popover(isPresented: Binding(
+                    get: { selectedDay == day },
+                    set: { if !$0 { selectedDay = nil } }
+                )) {
+                    DayInfoPopover(lang: lang, rep: rep, month: 12, day: day)
                 }
             }
         }
