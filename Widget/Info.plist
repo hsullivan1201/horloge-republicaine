@@ -12,15 +12,21 @@
 	<string>HorlogeWidget</string>
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>MacOSX</string>
+	</array>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
-	<key>NSExtension</key>
+	<key>EXAppExtensionAttributes</key>
 	<dict>
-		<key>NSExtensionPointIdentifier</key>
+		<key>EXExtensionPointIdentifier</key>
 		<string>com.apple.widgetkit-extension</string>
 	</dict>
 </dict>

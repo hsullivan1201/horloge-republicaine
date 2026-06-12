@@ -4,8 +4,11 @@
 set -e
 cd "$(dirname "$0")"
 
+# ExtensionKit layout (Contents/Extensions): the only widget format the
+# macOS gallery picks up for native Mac apps. PlugIns/NSExtension is the
+# legacy iOS-style form and gets silently ignored.
 APP="build/Horloge Républicaine.app"
-APPEX="$APP/Contents/PlugIns/HorlogeWidget.appex"
+APPEX="$APP/Contents/Extensions/HorlogeWidget.appex"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APPEX/Contents/MacOS"
 
