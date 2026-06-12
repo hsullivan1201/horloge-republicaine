@@ -37,6 +37,7 @@ struct HorlogeApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.activate(ignoringOtherApps: true)
+        ChimeController.shared.start()
     }
 }
 
@@ -137,6 +138,7 @@ struct MenuBarLabel: View {
 struct MenuBarPopover: View {
     @Environment(\.openWindow) private var openWindow
     @AppStorage("language") private var languageRaw = Language.fr.rawValue
+    @AppStorage("chime") private var chime = true
     @State private var now = Date()
     private let timer = Timer.publish(every: 0.4, on: .main, in: .common).autoconnect()
 
@@ -185,6 +187,24 @@ struct MenuBarPopover: View {
                 }
             }
             .buttonStyle(RevolutionButtonStyle())
+
+            HStack(spacing: 6) {
+                Toggle(isOn: $chime) {
+                    Text(tr(lang, "carillon de l'heure décimale", "decimal hour chime"))
+                        .font(.system(size: 11, design: .serif))
+                        .foregroundStyle(Theme.faded)
+                }
+                .toggleStyle(.checkbox)
+                Button {
+                    ChimeController.shared.preview()
+                } label: {
+                    Image(systemName: "speaker.wave.2")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.blue)
+                }
+                .buttonStyle(.plain)
+                .help(tr(lang, "écouter", "listen"))
+            }
         }
         .padding(14)
         .background(Theme.parchment)
