@@ -3,7 +3,7 @@
 ## Future features
 
 - **This day in the Revolution**: historical events keyed to Republican dates (18 Brumaire for Napoleon's coup, 9 Thermidor for the fall of Robespierre, 13 Vendémiaire for the whiff of grapeshot...). Show a "ce jour-là" line in the day popover and on the almanac month pages.
-- **Engravings**: two follow-ups. (1) Extend past Prairial — only month 8 is filled in; each other month needs its own list in Engravings.swift. (2) Upgrade more Prairial days to frame-filling Besler 1640 plates. Days 2, 8, 11, 16, 17, 18 now use uncolored Besler engravings (grey, no whitespace); the rest fall back to their original plate, desaturated to grey in-app. Humble herbs (clover, thyme, pea, balm) only appear as side sprigs in Besler, so they'd need a different frame-filling source (Fuchs woodcuts?) or stay as greyed fallbacks. Could also auto-trim the cream scan margins inside each plate.
+- **Engravings**: Prairial and Messidor (months 8 and 9) are done; the other ten months each need their own list in Engravings.swift. Messidor covers 16 of 30 days (Besler 1640 copperplates plus a few Köhler plates for harvest staples); the cereals (rye, oat), alliums (garlic, shallot), exotic clove, bean, vetch, the three animals (mule, chamois, guineafowl) and tools (sickle, shawm, parc) have no good frame-filling plate and are left imageless. Same gaps will recur each month for animals/tools — might want a fallback set of Gessner woodcuts (animals) and Encyclopédie plates (tools). Could also auto-trim the cream scan margins inside each plate.
 
 ## Done
 

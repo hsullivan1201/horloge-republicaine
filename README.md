@@ -13,7 +13,7 @@ In 1793 the National Convention decreed that the day would have 10 hours, each h
 - Calendar grid of any month, 3 décades of 10 days, with today circled. Arrows to browse the year, hover any day to see what it's consecrated to
 - An Almanac window for digging into the lore: how decimal time worked, the ten weekday names and their Latin roots, every month with all 30 day names and English translations, the etymology of each month name, the British nicknames (Wheezy, Sneezy, Freezy...), and the sans-culottides
 - A date and time converter in both directions, for deciphering revolutionary documents or finding your Republican birthday
-- Click any day for its old-style (Gregorian) date. Prairial days also show a period engraving for what the day honors (dense Besler copperplates where possible), desaturated to grey, pulled from public-domain plates on Wikimedia Commons
+- Click any day for its old-style (Gregorian) date. Prairial and Messidor days also show a period engraving for what the day honors (dense Besler copperplates where possible), desaturated to grey, pulled from public-domain plates on Wikimedia Commons
 - French or English interface, toggle anywhere
 - A widget for the Notification Center sidebar and the desktop (the medium size includes the dial). Add it via Edit Widgets after launching the app once
 - Conventional time at the bottom, for the unconverted

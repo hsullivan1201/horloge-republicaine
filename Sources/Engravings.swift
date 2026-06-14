@@ -34,10 +34,15 @@ struct Plate {
 }
 
 enum Engravings {
-    // month is 0-based; Prairial is index 8.
+    // month is 0-based; Prairial is index 8, Messidor index 9.
     static func plate(month: Int, day: Int) -> Plate? {
-        guard month == 8 else { return nil }
-        return prairialPlates.first { $0.day == day }
+        let plates: [Plate]
+        switch month {
+        case 8: plates = prairialPlates
+        case 9: plates = messidorPlates
+        default: return nil
+        }
+        return plates.first { $0.day == day }
     }
 }
 
@@ -158,6 +163,77 @@ let prairialPlates: [Plate] = [
           collection: "Diderot, Encyclopédie (planches)", commonsFile: "File:Encyclopedie volume 2b-007.png",
           credit: "Diderot et d'Alembert", license: "Public domain",
           sourceURL: "https://upload.wikimedia.org/wikipedia/commons/6/6d/Encyclopedie_volume_2b-007.png", status: .sourceVerified),
+]
+
+// Messidor (month index 9). Mostly uncolored Besler 1640 copperplates where
+// the named plant appears on the plate; a few harvest staples come from
+// Köhler's Medizinal-Pflanzen. Cereals, alliums, animals and tools that no
+// good frame-filling plate covers are left without an engraving.
+let messidorPlates: [Plate] = [
+    Plate(day: 3, fr: "Oignon", en: "onion", subject: "Allium",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 070).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Hortus_Eystettensis%2C_1640_%28BHL_45339_070%29_-_Classis_Verna_59.jpg", status: .sourceVerified),
+    Plate(day: 4, fr: "Véronique", en: "speedwell", subject: "Veronica",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 100).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Hortus_Eystettensis%2C_1640_%28BHL_45339_100%29_-_Classis_Verna_89.jpg", status: .sourceVerified),
+    Plate(day: 6, fr: "Romarin", en: "rosemary", subject: "Rosmarinus officinalis",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 303).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Hortus_Eystettensis%2C_1640_%28BHL_45339_303%29_-_Classis_Aestiva_151.jpg", status: .sourceVerified),
+    Plate(day: 9, fr: "Absinthe", en: "wormwood", subject: "Artemisia absinthium",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 306).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/a/af/Hortus_Eystettensis%2C_1640_%28BHL_45339_306%29_-_Classis_Aestiva_154.jpg", status: .verified),
+    Plate(day: 11, fr: "Coriandre", en: "coriander", subject: "Coriandrum sativum",
+          collection: "Köhler, Medizinal-Pflanzen", commonsFile: "File:Coriandrum sativum Köhler.jpg",
+          credit: "Köhler's Medizinal-Pflanzen", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/1/13/Coriandrum_sativum_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-193.jpg", status: .verified),
+    Plate(day: 12, fr: "Artichaut", en: "artichoke", subject: "Cynara",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 298).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/b/b6/Hortus_Eystettensis%2C_1640_%28BHL_45339_298%29_-_Classis_Aestiva_146.jpg", status: .verified),
+    Plate(day: 14, fr: "Lavande", en: "lavender", subject: "Lavandula",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 329).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/c/cc/Hortus_Eystettensis%2C_1640_%28BHL_45339_329%29_-_Classis_Aestiva_177.jpg", status: .sourceVerified),
+    Plate(day: 16, fr: "Tabac", en: "tobacco", subject: "Nicotiana tabacum",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 362).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/b/b9/Hortus_Eystettensis%2C_1640_%28BHL_45339_362%29_-_Classis_Autumnalis_22.jpg", status: .verified),
+    Plate(day: 17, fr: "Groseille", en: "redcurrant", subject: "Ribes",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 025).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/9/9c/Hortus_Eystettensis%2C_1640_%28BHL_45339_025%29_-_Classis_Verna_14.jpg", status: .verified),
+    Plate(day: 18, fr: "Gesse", en: "vetchling", subject: "Lathyrus",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 031).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Hortus_Eystettensis%2C_1640_%28BHL_45339_031%29_-_Classis_Verna_20.jpg", status: .sourceVerified),
+    Plate(day: 19, fr: "Cerise", en: "cherry", subject: "Prunus cerasus",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 015).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Hortus_Eystettensis%2C_1640_%28BHL_45339_015%29_-_Classis_Verna_4.jpg", status: .verified),
+    Plate(day: 21, fr: "Menthe", en: "mint", subject: "Mentha",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 181).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/9/98/Hortus_Eystettensis%2C_1640_%28BHL_45339_181%29_-_Classis_Aestiva_29.jpg", status: .sourceVerified),
+    Plate(day: 22, fr: "Cumin", en: "cumin", subject: "Cuminum cyminum",
+          collection: "Köhler, Medizinal-Pflanzen", commonsFile: "File:Cuminum cyminum Köhler.jpg",
+          credit: "Köhler's Medizinal-Pflanzen", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/5/58/Cuminum_cyminum_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-198.jpg", status: .verified),
+    Plate(day: 24, fr: "Orcanète", en: "alkanet", subject: "Anchusa",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 260).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Hortus_Eystettensis%2C_1640_%28BHL_45339_260%29_-_Classis_Aestiva_108.jpg", status: .verified),
+    Plate(day: 26, fr: "Sauge", en: "sage", subject: "Salvia",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 138).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Hortus_Eystettensis%2C_1640_%28BHL_45339_138%29_-_Classis_Verna_127.jpg", status: .sourceVerified),
+    Plate(day: 29, fr: "Blé", en: "wheat", subject: "Triticum",
+          collection: "Köhler, Medizinal-Pflanzen", commonsFile: "File:Triticum vulgare Köhler.jpg",
+          credit: "Walther Otto Müller", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/8/81/K%C3%B6hler%27s_Medizinal-Pflanzen_in_naturgetreuen_Abbildungen_mit_kurz_erl%C3%A4uterndem_Texte_%28Plate_87%29_%288231709397%29.jpg", status: .verified),
 ]
 
 // MARK: - Networking
