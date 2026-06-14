@@ -3,7 +3,7 @@
 ## Future features
 
 - **This day in the Revolution**: historical events keyed to Republican dates (18 Brumaire for Napoleon's coup, 9 Thermidor for the fall of Robespierre, 13 Vendémiaire for the whiff of grapeshot...). Show a "ce jour-là" line in the day popover and on the almanac month pages.
-- **Engravings**: public domain illustrations for the 366 rural day names, sourced from Wikimedia Commons (the original almanacs were illustrated). Show them in the day popover and almanac. Biggest effort of the four since each image has to be found and credited.
+- **Engravings**: extend past Prairial. Day popovers now show a public-domain plate for the day's plant/animal/tool, but only Prairial (month 8) is filled in. Each other month needs its own `prairialPlates`-style list in Engravings.swift. A handful of Prairial plates are still `.needsVerify` (right subject, filename lacks the species) and should be eyeballed in the app.
 
 ## Done
 
