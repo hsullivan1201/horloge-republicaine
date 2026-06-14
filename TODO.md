@@ -3,7 +3,7 @@
 ## Future features
 
 - **This day in the Revolution**: historical events keyed to Republican dates (18 Brumaire for Napoleon's coup, 9 Thermidor for the fall of Robespierre, 13 Vendémiaire for the whiff of grapeshot...). Show a "ce jour-là" line in the day popover and on the almanac month pages.
-- **Engravings**: extend past Prairial. Day popovers now show a public-domain plate for the day's plant/animal/tool, but only Prairial (month 8) is filled in. Each other month needs its own `prairialPlates`-style list in Engravings.swift. A handful of Prairial plates are still `.needsVerify` (right subject, filename lacks the species) and should be eyeballed in the app.
+- **Engravings**: two follow-ups. (1) Extend past Prairial — only month 8 is filled in; each other month needs its own list in Engravings.swift. (2) Upgrade more Prairial days to frame-filling Besler 1640 plates. Days 2, 8, 11, 16, 17, 18 now use uncolored Besler engravings (grey, no whitespace); the rest fall back to their original plate, desaturated to grey in-app. Humble herbs (clover, thyme, pea, balm) only appear as side sprigs in Besler, so they'd need a different frame-filling source (Fuchs woodcuts?) or stay as greyed fallbacks. Could also auto-trim the cream scan margins inside each plate.
 
 ## Done
 

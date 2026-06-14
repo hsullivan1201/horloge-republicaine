@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import CoreImage
 
 //  Engravings — public-domain botanical/zoological plates for the rural days,
 //  harvested from Wikimedia Commons (originally gathered in
@@ -42,9 +43,9 @@ enum Engravings {
 
 let prairialPlates: [Plate] = [
     Plate(day: 2, fr: "Hémérocalle", en: "day-lily", subject: "Hemerocallis",
-          collection: "botanical illustration", commonsFile: "File:Illustration Hemerocallis fulva0.jpg",
-          credit: "Otto Wilhelm Thomé", license: "Public domain",
-          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/6/68/Illustration_Hemerocallis_fulva0.jpg", status: .verified),
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 076).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/2/25/Hortus_Eystettensis%2C_1640_%28BHL_45339_076%29_-_Classis_Verna_65.jpg", status: .sourceVerified),
     Plate(day: 3, fr: "Trèfle", en: "clover", subject: "Trifolium pratense",
           collection: "Sturm, Deutschlands Flora", commonsFile: "File:Trifolium pratense Sturm35.jpg",
           credit: "Johann Georg Sturm (Painter: Jacob Sturm)", license: "Public domain",
@@ -65,10 +66,10 @@ let prairialPlates: [Plate] = [
           collection: "Naturgeschichte des Pflanzenreichs", commonsFile: "File:Naturgeschichte des Pflanzenreichs Tafel V.jpg",
           credit: "Jacob Sturm (?)", license: "Public domain",
           sourceURL: "https://upload.wikimedia.org/wikipedia/commons/5/53/Naturgeschichte_des_Pflanzenreichs_Tafel_V.jpg", status: .needsVerify),
-    Plate(day: 8, fr: "Martagon", en: "martagon lily", subject: "Lilium martagon",
-          collection: "Sturm, Deutschlands Flora", commonsFile: "File:Lilium martagon Sturm29.jpg",
-          credit: "Johann Georg Sturm (Painter: Jacob Sturm)", license: "Public domain",
-          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/2/25/Lilium_martagon_Sturm29.jpg", status: .verified),
+    Plate(day: 8, fr: "Martagon", en: "martagon lily", subject: "Lilium",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 097).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/d/df/Hortus_Eystettensis%2C_1640_%28BHL_45339_097%29_-_Classis_Verna_86.jpg", status: .sourceVerified),
     Plate(day: 9, fr: "Serpolet", en: "wild thyme", subject: "Thymus serpyllum",
           collection: "Sturm, Deutschlands Flora", commonsFile: "File:Thymus serpyllum Sturm57.jpg",
           credit: "Johann Georg Sturm (Painter: Jacob Sturm)", license: "Public domain",
@@ -77,10 +78,10 @@ let prairialPlates: [Plate] = [
           collection: "placeholder", commonsFile: nil,
           credit: "—", license: "",
           sourceURL: "", status: .placeholder),
-    Plate(day: 11, fr: "Fraise", en: "strawberry", subject: "Fragaria vesca",
-          collection: "Naturgeschichte des Pflanzenreichs", commonsFile: "File:Naturgeschichte des Pflanzenreichs Tafel XXVI.jpg",
-          credit: "Jacob Sturm (?)", license: "Public domain",
-          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/b/bb/Naturgeschichte_des_Pflanzenreichs_Tafel_XXVI.jpg", status: .needsVerify),
+    Plate(day: 11, fr: "Fraise", en: "strawberry", subject: "Fragaria",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 127).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/7/70/Hortus_Eystettensis%2C_1640_%28BHL_45339_127%29_-_Classis_Verna_116.jpg", status: .verified),
     Plate(day: 12, fr: "Bétoine", en: "betony", subject: "Stachys officinalis",
           collection: "Naturgeschichte des Pflanzenreichs", commonsFile: "File:Naturgeschichte des Pflanzenreichs Tafel XXXI.jpg",
           credit: "Jacob Sturm (?)", license: "Public domain",
@@ -98,17 +99,17 @@ let prairialPlates: [Plate] = [
           credit: "Naumann, Naturgeschichte der Vögel Deutschlands", license: "Public domain",
           sourceURL: "https://upload.wikimedia.org/wikipedia/commons/a/a7/Johann_Andreas_Naumann%27s_..._Naturgeschichte_der_V%C3%B6gel_Deutschlands%2C_nach_einigen_Erfahrungen_entworfen_%28Taf._166%29_%286058878909%29.jpg", status: .sourceVerified),
     Plate(day: 16, fr: "Œillet", en: "carnation", subject: "Dianthus caryophyllus",
-          collection: "Besler, Hortus Eystettensis (1613)", commonsFile: "File:Hortus Eystettensis, 1613 (KU 2894-3 143) -Aestiva,14,4.jpg",
-          credit: "Basilius Besler / Raphael Custos", license: "Public domain",
-          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/b/b2/Hortus_Eystettensis%2C_1613_%28KU_2894-3_143%29_-Aestiva%2C14%2C4.jpg", status: .needsVerify),
-    Plate(day: 17, fr: "Sureau", en: "elder", subject: "Sambucus nigra",
-          collection: "Naturgeschichte des Pflanzenreichs", commonsFile: "File:Naturgeschichte des Pflanzenreichs Tafel XVI.jpg",
-          credit: "Jacob Sturm (?)", license: "Public domain",
-          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Naturgeschichte_des_Pflanzenreichs_Tafel_XVI.jpg", status: .needsVerify),
-    Plate(day: 18, fr: "Pavot", en: "poppy", subject: "Papaver somniferum",
-          collection: "Naturgeschichte des Pflanzenreichs", commonsFile: "File:Naturgeschichte des Pflanzenreichs Tafel XXVI.jpg",
-          credit: "Jacob Sturm (?)", license: "Public domain",
-          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/b/bb/Naturgeschichte_des_Pflanzenreichs_Tafel_XXVI.jpg", status: .needsVerify),
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 332).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/4/41/Hortus_Eystettensis%2C_1640_%28BHL_45339_332%29_-_Classis_Aestiva_180.jpg", status: .verified),
+    Plate(day: 17, fr: "Sureau", en: "elder", subject: "Sambucus",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 021).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Hortus_Eystettensis%2C_1640_%28BHL_45339_021%29_-_Classis_Verna_10.jpg", status: .sourceVerified),
+    Plate(day: 18, fr: "Pavot", en: "poppy", subject: "Papaver",
+          collection: "Besler, Hortus Eystettensis (1640)", commonsFile: "File:Hortus Eystettensis, 1640 (BHL 45339 309).jpg",
+          credit: "Basilius Besler", license: "Public domain",
+          sourceURL: "https://upload.wikimedia.org/wikipedia/commons/b/b6/Hortus_Eystettensis%2C_1640_%28BHL_45339_309%29_-_Classis_Aestiva_157.jpg", status: .verified),
     Plate(day: 19, fr: "Tilleul", en: "linden", subject: "Tilia",
           collection: "Sturm, Deutschlands Flora", commonsFile: "File:Tilia platyphyllos Sturm61.jpg",
           credit: "Johann Georg Sturm (Painter: Jacob Sturm)", license: "Public domain",
@@ -174,6 +175,22 @@ enum EngravingNetwork {
         config.requestCachePolicy = .returnCacheDataElseLoad
         return URLSession(configuration: config)
     }()
+
+    // Decode and strip color so the plate reads as a grey engraving. Not on
+    // the main actor, so the detached task does this work off the UI thread.
+    static func grayscale(_ data: Data) -> NSImage? {
+        guard let source = CIImage(data: data) else {
+            return NSImage(data: data)  // fall back to color rather than nothing
+        }
+        let mono = source.applyingFilter("CIColorControls",
+                                         parameters: [kCIInputSaturationKey: 0.0,
+                                                      kCIInputContrastKey: 1.05])
+        let context = CIContext()
+        guard let cg = context.createCGImage(mono, from: mono.extent) else {
+            return NSImage(data: data)
+        }
+        return NSImage(cgImage: cg, size: NSSize(width: cg.width, height: cg.height))
+    }
 }
 
 // MARK: - View
@@ -200,11 +217,11 @@ struct EngravingView: View {
     private func content(url: URL) -> some View {
         ZStack {
             if let image {
+                let fit = Self.fittedSize(image.size, maxW: 240, maxH: 270)
                 Image(nsImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: 240, maxHeight: 260)
-                    .background(Color.white)
+                    .frame(width: fit.width, height: fit.height)
                     .overlay(Rectangle().stroke(Theme.ink.opacity(0.3), lineWidth: 1))
             } else if failed {
                 note(tr(lang, "gravure indisponible", "engraving unavailable"))
@@ -220,7 +237,10 @@ struct EngravingView: View {
             failed = false
             do {
                 let (data, _) = try await EngravingNetwork.session.data(from: url)
-                if let img = NSImage(data: data) { image = img } else { failed = true }
+                // Desaturate off the main actor; these plates read better as
+                // grey sketches than in their faded period color.
+                let gray = await Task.detached { EngravingNetwork.grayscale(data) }.value
+                if let gray { image = gray } else { failed = true }
             } catch {
                 failed = true
             }
@@ -258,5 +278,15 @@ struct EngravingView: View {
         Text(text)
             .font(.system(size: 10, design: .serif).italic())
             .foregroundStyle(Theme.faded)
+    }
+
+    // The frame hugs the plate's own proportions so there are no white bars
+    // beside portrait images.
+    static func fittedSize(_ s: CGSize, maxW: CGFloat, maxH: CGFloat) -> CGSize {
+        guard s.width > 0, s.height > 0 else { return CGSize(width: maxW, height: maxH) }
+        let aspect = s.width / s.height
+        var w = maxH * aspect, h = maxH
+        if w > maxW { w = maxW; h = maxW / aspect }
+        return CGSize(width: w, height: h)
     }
 }
