@@ -7,7 +7,7 @@ In 1793 the National Convention decreed that the day would have 10 hours, each h
 ## What it does
 
 - Lives in your menu bar, ticking in decimal seconds (one every 0.864 normal seconds), with a quick popover
-- Rings a little synthesized bell at each new decimal hour (every 2 h 24 of old time), and plays the opening of La Marseillaise at decimal noon. Toggle it in the menu bar popover
+- Plays the opening of La Marseillaise on synthesized bells at each new decimal hour (every 2 h 24 of old time). Toggle it in the menu bar popover
 - Analog 10-hour dial, like the actual decimal watch faces made in the 1790s (the hour hand makes one full turn per day)
 - Today's Republican date, e.g. `Quartidi 24 Prairial · An CCXXXIV`, with the rural day name
 - Calendar grid of any month, 3 décades of 10 days, with today circled. Arrows to browse the year, hover any day to see what it's consecrated to

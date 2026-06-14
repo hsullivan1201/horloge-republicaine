@@ -14,7 +14,7 @@
 - [x] Click any day for its old-style date
 - [x] Date converter, both directions (in the almanac)
 - [x] Widget for Notification Center and desktop (small: date + decimal time, medium: adds the dial). Follows the system language since there is no app group; updates once per decimal minute. Built correctly but the gallery rejects ad-hoc signed extensions; needs an Apple Development certificate (one codesign line in build.sh).
-- [x] Decimal hour chime: synthesized bells every decimal hour, La Marseillaise at decimal noon. Toggle + preview in the menu bar popover.
+- [x] Decimal hour chime: La Marseillaise on synthesized bells at every decimal hour. Toggle + preview in the menu bar popover.
 
 ## Other ideas
 

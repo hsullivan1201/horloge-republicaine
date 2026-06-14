@@ -31,8 +31,8 @@ final class ChimeController {
         engine.connect(player, to: engine.mainMixerNode, format: format)
     }
 
-    func preview(noon: Bool = false) {
-        play(notes: noon ? Self.marseillaise : Self.dingDong)
+    func preview() {
+        play(notes: Self.marseillaise)
     }
 
     // MARK: - Scheduling
@@ -47,13 +47,12 @@ final class ChimeController {
 
         let nextIndex = floor(fraction * 10) + 1
         let fireDate = dayStart.addingTimeInterval(nextIndex / 10 * dayLength + 0.05)
-        let hour = Int(nextIndex) % 10
 
         let timer = Timer(fire: fireDate, interval: 0, repeats: false) { [weak self] _ in
             // Wake-from-sleep delivers stale timers; stay silent if the
             // moment passed more than two minutes ago.
             if Date().timeIntervalSince(fireDate) < 120 {
-                self?.ring(hour: hour)
+                self?.ring()
             }
             self?.scheduleNext()
         }
@@ -61,9 +60,9 @@ final class ChimeController {
         self.timer = timer
     }
 
-    private func ring(hour: Int) {
+    private func ring() {
         guard UserDefaults.standard.bool(forKey: "chime") else { return }
-        play(notes: hour == 5 ? Self.marseillaise : Self.dingDong)
+        play(notes: Self.marseillaise)
     }
 
     // MARK: - Bell synthesis
@@ -74,13 +73,7 @@ final class ChimeController {
         let duration: Double
     }
 
-    // Two-tone strike for ordinary hours.
-    private static let dingDong = [
-        Note(freq: 783.99, start: 0.0, duration: 1.3),  // G5
-        Note(freq: 587.33, start: 0.5, duration: 1.8),  // D5
-    ]
-
-    // "Allons enfants de la Patrie..." in G, on bells, for decimal noon.
+    // "Allons enfants de la Patrie..." on bells, every decimal hour.
     private static let marseillaise = [
         Note(freq: 293.66, start: 0.00, duration: 0.40), // D4  Al-
         Note(freq: 293.66, start: 0.24, duration: 0.32), // D4  lons
