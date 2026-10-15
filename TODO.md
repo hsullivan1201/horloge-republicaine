@@ -13,7 +13,7 @@
 ## Done
 
 - [x] Mac widget now shows up in the gallery. It never had: macOS couldn't find the extension inside "Horloge Républicaine.app" because of the é, so the bundle folder is now `HorlogeRepublicaine.app` with a localized display name. `./build.sh install` moves the build into /Applications
-- [x] Mac app icon: tricolor cockade around the 10-hour dial, drawn by `Icon/make-mac-icon.swift`
+- [x] App icon (Mac and iPhone): tricolor cockade around the 10-hour dial, drawn by `Icon/make-icon.swift`
 
 - [x] Redesign: enamel dial with an inner 24-hour ring and Breguet hands, Didot type, two-column Mac window, faded past days and shaded décadi column
 - [x] Nuit theme (and Auto), replacing the forced light mode. Applies to the Mac windows, menu bar panel, iPhone app and widgets

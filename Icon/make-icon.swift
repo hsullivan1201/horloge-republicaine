@@ -1,7 +1,8 @@
-// Draws the Mac app icon and writes Icon/AppIcon.icns.
+// Draws the app icon: Icon/AppIcon.icns for the Mac, and the full-bleed
+// 1024 px PNG the iPhone app's asset catalog uses.
 //
-//   swift Icon/make-mac-icon.swift                  build the icns (Cocarde)
-//   swift Icon/make-mac-icon.swift preview <dir>    write PNG previews of all variants
+//   swift Icon/make-icon.swift                  build both (Cocarde)
+//   swift Icon/make-icon.swift preview <dir>    write PNG previews of all variants
 //
 // Same vocabulary as the in-app dial: enamel face, gilt bezel, all ten
 // numerals in Didot, a Breguet hour hand. The hands stand at 8.17, the
@@ -179,22 +180,31 @@ func dial(_ ctx: CGContext, center c: CGPoint, radius r: CGFloat, style s: DialS
     ctx.fillEllipse(in: circle(c, r * 0.035))
 }
 
-func render(_ variant: Variant, size: Int) -> CGImage {
+// fullBleed: the iPhone version. iOS rounds the corners itself and rejects
+// transparency, so the tile's contents fill an opaque square instead.
+func render(_ variant: Variant, size: Int, fullBleed: Bool = false) -> CGImage {
     let ctx = CGContext(data: nil, width: size, height: size, bitsPerComponent: 8, bytesPerRow: 0,
                         space: CGColorSpace(name: CGColorSpace.sRGB)!,
-                        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-    ctx.scaleBy(x: CGFloat(size) / 1024, y: CGFloat(size) / 1024)
+                        bitmapInfo: (fullBleed ? CGImageAlphaInfo.noneSkipLast : .premultipliedLast).rawValue)!
     ctx.setShouldAntialias(true)
 
     // macOS tile: 824 pt rounded square on a 1024 canvas, with a soft shadow
     let tile = CGRect(x: 100, y: 100, width: 824, height: 824)
-    let shape = CGPath(roundedRect: tile, cornerWidth: 185, cornerHeight: 185, transform: nil)
-    ctx.saveGState()
-    ctx.setShadow(offset: CGSize(width: 0, height: -10), blur: 24, color: CGColor(gray: 0, alpha: 0.35))
-    ctx.addPath(shape)
-    ctx.setFillColor(CGColor(gray: 0.5, alpha: 1))
-    ctx.fillPath()
-    ctx.restoreGState()
+    let shape = fullBleed
+        ? CGPath(rect: tile, transform: nil)
+        : CGPath(roundedRect: tile, cornerWidth: 185, cornerHeight: 185, transform: nil)
+    if fullBleed {
+        ctx.scaleBy(x: CGFloat(size) / 824, y: CGFloat(size) / 824)
+        ctx.translateBy(x: -100, y: -100)
+    } else {
+        ctx.scaleBy(x: CGFloat(size) / 1024, y: CGFloat(size) / 1024)
+        ctx.saveGState()
+        ctx.setShadow(offset: CGSize(width: 0, height: -10), blur: 24, color: CGColor(gray: 0, alpha: 0.35))
+        ctx.addPath(shape)
+        ctx.setFillColor(CGColor(gray: 0.5, alpha: 1))
+        ctx.fillPath()
+        ctx.restoreGState()
+    }
 
     ctx.saveGState()
     ctx.addPath(shape)
@@ -232,10 +242,12 @@ func render(_ variant: Variant, size: Int) -> CGImage {
     ctx.restoreGState()
 
     // Hairline edge
-    ctx.addPath(shape)
-    ctx.setStrokeColor(CGColor(gray: 0, alpha: 0.15))
-    ctx.setLineWidth(2)
-    ctx.strokePath()
+    if !fullBleed {
+        ctx.addPath(shape)
+        ctx.setStrokeColor(CGColor(gray: 0, alpha: 0.15))
+        ctx.setLineWidth(2)
+        ctx.strokePath()
+    }
     return ctx.makeImage()!
 }
 
@@ -270,4 +282,8 @@ if args.count > 2 && args[1] == "preview" {
     task.waitUntilExit()
     try? fm.removeItem(atPath: iconset)
     print(task.terminationStatus == 0 ? "Wrote Icon/AppIcon.icns (\(variant.rawValue))" : "iconutil failed")
+
+    let ios = "Mobile/Assets.xcassets/AppIcon.appiconset/HorlogeAppIcon.png"
+    try writePNG(render(variant, size: 1024, fullBleed: true), ios)
+    print("Wrote \(ios)")
 }

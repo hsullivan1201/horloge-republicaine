@@ -48,7 +48,7 @@ That builds the app and moves it to `/Applications/HorlogeRepublicaine.app`. Pla
 
 The folder name has no accent on purpose. With the é in the path, macOS can't find the widget extension and it never shows up in the widget gallery. Finder and the Dock still show "Horloge Républicaine".
 
-The icon is drawn in code by `Icon/make-mac-icon.swift` (`swift Icon/make-mac-icon.swift` rebuilds `Icon/AppIcon.icns`).
+The icon is drawn in code by `Icon/make-icon.swift` (`swift Icon/make-icon.swift` rebuilds the Mac `.icns` and the iPhone app icon).
 
 Pure SwiftUI, with zero third-party dependencies.
 

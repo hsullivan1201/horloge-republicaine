@@ -24,7 +24,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APPEX/Contents/MacOS"
 
 swiftc -O -parse-as-library Sources/*.swift -o "$APP/Contents/MacOS/HorlogeRepublicaine"
 cp Info.plist "$APP/Contents/Info.plist"
-# Icon is generated from the iPhone artwork by Icon/make-mac-icon.swift.
+# Icon is drawn by Icon/make-icon.swift.
 cp Icon/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp -R MacResources/ "$APP/Contents/Resources/"
 
