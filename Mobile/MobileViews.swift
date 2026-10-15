@@ -635,7 +635,7 @@ private struct MobileSettingsView: View {
             Section(tr(lang, "Widgets", "Widgets")) {
                 VStack(alignment: .leading, spacing: 10) {
                     Label(tr(lang, "Écran d'accueil : petit et moyen (avec le cadran)", "Home Screen: small and medium (with the dial)"), systemImage: "square.grid.2x2")
-                    Label(tr(lang, "Écran verrouillé : cadran rond, rectangle et ligne", "Lock Screen: round dial, rectangle, and inline"), systemImage: "lock")
+                    Label(tr(lang, "Écran verrouillé : cadran rond, rectangle, ligne, et « Heure décimale » en grand", "Lock Screen: round dial, rectangle, inline, and a big “Heure décimale”"), systemImage: "lock")
                     Label(tr(lang, "En veille (StandBy) : le petit widget", "StandBy: the small widget"), systemImage: "platter.filled.bottom.iphone")
 
                     Text(tr(lang,

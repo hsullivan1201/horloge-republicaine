@@ -1,9 +1,10 @@
 import WidgetKit
 import SwiftUI
 
-// Widgets are snapshots, not live views. iOS coalesces very frequent entries,
-// so the timeline advances every five decimal minutes. That is 7m12s on a
-// normal day and automatically scales on 23/25-hour DST transition days.
+// Widgets are snapshots, not live views. The main widget's timeline advances
+// every five decimal minutes: 7m12s on a normal day, scaling automatically on
+// 23/25-hour DST transition days. The big lock screen time steps every
+// decimal minute (86.4 s), since a stale minute shows at that size.
 // The hour bar in between is a ProgressView(timerInterval:), which the
 // system animates live without extra entries.
 //
@@ -18,6 +19,9 @@ struct DecimalEntry: TimelineEntry {
 }
 
 struct DecimalProvider: TimelineProvider {
+    var decimalMinutes: Double = 5  // spacing between entries
+    var entryCount = 72              // 6 hours at 5, about 3.5 hours at 1
+
     func placeholder(in context: Context) -> DecimalEntry {
         DecimalEntry(date: Date())
     }
@@ -42,20 +46,20 @@ struct DecimalProvider: TimelineProvider {
 
         // Entries run on past the horizon (six hours in all) so the clock
         // keeps moving if the system is slow to grant the reload.
-        while entries.count < 72 {
+        while entries.count < entryCount {
             let dayStart = calendar.startOfDay(for: cursor)
             let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
-            let fiveDecimalMinutes = dayEnd.timeIntervalSince(dayStart) / 200
+            let step = dayEnd.timeIntervalSince(dayStart) / 1000 * decimalMinutes
             let elapsed = cursor.timeIntervalSince(dayStart)
-            var boundary = floor(elapsed / fiveDecimalMinutes) + 1
-            var next = dayStart.addingTimeInterval(boundary * fiveDecimalMinutes + 0.1)
+            var boundary = floor(elapsed / step) + 1
+            var next = dayStart.addingTimeInterval(boundary * step + 0.1)
 
-            // Keep the first scheduled refresh at least five conventional
-            // minutes away when possible. Midnight remains a useful exception
-            // so the displayed Republican date rolls over promptly.
-            if entries.count == 1 && next.timeIntervalSince(now) < 300 {
+            // For the five-minute timeline, keep the first scheduled refresh
+            // at least five conventional minutes away when possible. Midnight
+            // remains a useful exception so the date rolls over promptly.
+            if decimalMinutes >= 5 && entries.count == 1 && next.timeIntervalSince(now) < 300 {
                 boundary += 1
-                next = dayStart.addingTimeInterval(boundary * fiveDecimalMinutes + 0.1)
+                next = dayStart.addingTimeInterval(boundary * step + 0.1)
             }
 
             if next >= dayEnd {
@@ -116,23 +120,8 @@ struct DecimalWidgetView: View {
     private var rep: RepublicanDate { RepublicanCalendar.date(from: entry.date) }
     private var dec: DecimalTime { RepublicanCalendar.decimalTime(for: entry.date) }
 
-    // The current decimal hour, for the live bar.
-    private var hourInterval: ClosedRange<Date> {
-        let calendar = RepublicanCalendar.localGregorianCalendar
-        let start = calendar.startOfDay(for: entry.date)
-        let hour = calendar.date(byAdding: .day, value: 1, to: start)!.timeIntervalSince(start) / 10
-        let hourStart = start.addingTimeInterval(Double(dec.hours) * hour)
-        return hourStart...hourStart.addingTimeInterval(hour)
-    }
-
     private var hourBar: some View {
-        ProgressView(timerInterval: hourInterval, countsDown: false) {
-            EmptyView()
-        } currentValueLabel: {
-            EmptyView()
-        }
-        .progressViewStyle(.linear)
-        .tint(Theme.blue)
+        HourBar(date: entry.date).tint(Theme.blue)
     }
 
     private var timeLine: some View {
@@ -247,6 +236,72 @@ struct DecimalWidgetView: View {
 #endif
 }
 
+// A bar across the current decimal hour. ProgressView(timerInterval:) is
+// animated live by the system, between timeline entries.
+struct HourBar: View {
+    let date: Date
+
+    var body: some View {
+        let calendar = RepublicanCalendar.localGregorianCalendar
+        let start = calendar.startOfDay(for: date)
+        let hour = calendar.date(byAdding: .day, value: 1, to: start)!.timeIntervalSince(start) / 10
+        let hourStart = start.addingTimeInterval(Double(RepublicanCalendar.decimalTime(for: date).hours) * hour)
+
+        ProgressView(timerInterval: hourStart...hourStart.addingTimeInterval(hour), countsDown: false) {
+            EmptyView()
+        } currentValueLabel: {
+            EmptyView()
+        }
+        .progressViewStyle(.linear)
+    }
+}
+
+#if os(iOS)
+// The lock screen's wide slot given over to the decimal time, as large as
+// it fits, with the hour bar and the date underneath.
+struct BigTimeView: View {
+    let entry: DecimalEntry
+
+    var body: some View {
+        let dec = RepublicanCalendar.decimalTime(for: entry.date)
+        let rep = RepublicanCalendar.date(from: entry.date)
+
+        VStack(alignment: .leading, spacing: 1) {
+            Text(dec.shortText)
+                .font(.didot(54, bold: true))
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .widgetAccentable()
+                .padding(.vertical, -6)
+            HStack(spacing: 6) {
+                HourBar(date: entry.date)
+                    .frame(width: 34)
+                Text(rep.republicanDay.shortTitle)
+                    .font(.system(size: 13, weight: .semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .containerBackground(for: .widget) { Color.clear }
+        .accessibilityElement(children: .combine)
+    }
+}
+
+struct BigTimeWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "RepublicanBigTime",
+                            provider: DecimalProvider(decimalMinutes: 1, entryCount: 150)) { entry in
+            BigTimeView(entry: entry)
+                .widgetURL(URL(string: "horloge-republicaine://clock"))
+        }
+        .configurationDisplayName("Heure décimale")
+        .description("L'heure décimale en grand, pour l'écran verrouillé.")
+        .supportedFamilies([.accessoryRectangular])
+    }
+}
+#endif
+
 struct RepublicanWidget: Widget {
     private var families: [WidgetFamily] {
 #if os(iOS)
@@ -271,5 +326,8 @@ struct RepublicanWidget: Widget {
 struct HorlogeWidgetBundle: WidgetBundle {
     var body: some Widget {
         RepublicanWidget()
+#if os(iOS)
+        BigTimeWidget()
+#endif
     }
 }
