@@ -34,8 +34,30 @@ cp Widget/Info.plist "$APPEX/Contents/Info.plist"
 IDENTITY=$(security find-identity -v -p codesigning | grep -om1 '"Apple Development: [^"]*"' | tr -d '"')
 [ -n "$IDENTITY" ] || IDENTITY="-"
 echo "Signing as: $IDENTITY"
-codesign --force -s "$IDENTITY" --entitlements Widget/widget.entitlements "$APPEX"
-codesign --force -s "$IDENTITY" "$APP"
+
+# The app and widget share settings (language, appearance) through an app
+# group. On macOS a group prefixed with the team ID needs no provisioning
+# profile, just both binaries signed by that team. The team ID is the OU of
+# the signing certificate. Ad hoc builds skip the group and the widget
+# follows the system language instead.
+APP_ENT="build/app.entitlements"
+WIDGET_ENT="build/widget.entitlements"
+cp Widget/widget.entitlements "$WIDGET_ENT"
+printf '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0"><dict/></plist>\n' > "$APP_ENT"
+if [ "$IDENTITY" != "-" ]; then
+    TEAM=$(security find-certificate -c "$IDENTITY" -p | openssl x509 -noout -subject | sed -n 's/.*OU *= *\([A-Z0-9]*\).*/\1/p')
+    GROUP="$TEAM.horloge-republicaine"
+    echo "App group: $GROUP"
+    for ENT in "$APP_ENT" "$WIDGET_ENT"; do
+        /usr/libexec/PlistBuddy -c "Add :com.apple.security.application-groups array" \
+            -c "Add :com.apple.security.application-groups:0 string $GROUP" "$ENT"
+    done
+    plutil -insert AppGroupID -string "$GROUP" "$APP/Contents/Info.plist"
+    plutil -insert AppGroupID -string "$GROUP" "$APPEX/Contents/Info.plist"
+fi
+
+codesign --force -s "$IDENTITY" --entitlements "$WIDGET_ENT" "$APPEX"
+codesign --force -s "$IDENTITY" --entitlements "$APP_ENT" "$APP"
 
 echo "Built $APP"
 echo "Run it with: open \"$APP\""

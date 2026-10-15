@@ -6,9 +6,18 @@
 
 ## Release checks
 
-- [ ] Build the iOS targets with full Xcode and verify the app plus both widget sizes on a simulator and physical iPhone
+- [x] Build the iOS targets with full Xcode and verify the app plus the Home Screen and Lock Screen widgets on a simulator
+- [ ] Verify on a physical iPhone, including that the app group provisions with your team
+- [ ] Check whether `WidgetCenter.reloadAllTimelines()` works on device. In the iOS 26.5 simulator chronod refuses it (ChronoCoreErrorDomain 10, and 27 for `reloadTimelines(ofKind:)`), so the widget picks up language and theme changes at its hourly refresh instead of right away
 
 ## Done
+
+- [x] Redesign: enamel dial with an inner 24-hour ring and Breguet hands, Didot type, two-column Mac window, faded past days and shaded décadi column
+- [x] Nuit theme (and Auto), replacing the forced light mode. Applies to the Mac windows, menu bar panel, iPhone app and widgets
+- [x] Menu bar display options: time, tiny dial, or date
+- [x] Lock Screen widgets (circular dial, rectangular, inline), StandBy, and a live decimal-hour bar on the Home Screen widgets
+- [x] Widget follows the app's language and theme through an app group
+- [x] Fixes: menu bar seconds aligned to real decimal-second boundaries, day names no longer doubled in English ("Amaryllis · Amaryllis"), Mac views use the Gregorian calendar explicitly, only the clock redraws every second, iPhone calendar no longer drops days 1 to 9
 
 - [x] Menu bar clock (MenuBarExtra with popover: clock, almanac, quit)
 - [x] Browse other months (chevrons in the calendar panel)
@@ -24,7 +33,6 @@
 ## Other ideas
 
 - Menu-bar-only mode: set `LSUIElement` to `true` in Info.plist to hide the Dock icon (needs a way to toggle it back)
-- Option to show the Republican date instead of (or with) the time in the menu bar
 - Launch at login via `SMAppService.mainApp.register()`
 - True equinox-based year start (Meeus algorithm) as an option, for the calendar purists
 - Notification at each new décadi, for the day of rest

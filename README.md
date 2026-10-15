@@ -7,16 +7,20 @@ In 1793 the National Convention decreed that the day would have 10 hours, each h
 ## What it does
 
 - On iPhone: a touch-first tab layout for the live clock, 10-column calendar, full almanac and converter, and settings
-- On macOS: lives in your menu bar, ticking in decimal seconds (one every 0.864 normal seconds), with a quick popover
+- On macOS: a two-column window (dial on the left, date and calendar on the right) plus a menu bar clock ticking in decimal seconds (one every 0.864 normal seconds). The menu bar can show the time, a tiny dial, or the date; pick in the popover
 - Plays the opening of La Marseillaise on synthesized bells at each new decimal hour (every 2 h 24 of old time). On iPhone this runs while the app is open; toggle it in Settings or the macOS menu bar popover
-- Analog 10-hour dial, like the actual decimal watch faces made in the 1790s (the hour hand makes one full turn per day)
+- Analog 10-hour enamel dial with Breguet-style hands, like the decimal clocks made in the 1790s. The hour hand makes one full turn per day, so a small 24-hour ring inside reads off the same hand, just like the period clocks that showed both
+- Set in Didot, the typeface Firmin Didot was cutting in Paris in those same years (it ships with macOS and iOS)
+- Jour and Nuit themes: parchment by day, ink blue and gilt at night. Auto follows the system
 - Today's Republican date, e.g. `Quartidi 24 Prairial · An CCXXXIV`, with the rural day name
-- Calendar grid of any month, 3 décades of 10 days, with today circled. Tap or click any day to see what it's consecrated to
+- Calendar grid of any month, 3 décades of 10 days, with today circled, past days faded and the décadi (day of rest) column shaded. Tap or click any day to see what it's consecrated to
 - An Almanac for digging into the lore: how decimal time worked, the ten weekday names and their Latin roots, every month with all 30 day names and English translations, the etymology of each month name, the British nicknames (Wheezy, Sneezy, Freezy...), and the sans-culottides
 - A date and time converter in both directions, for deciphering revolutionary documents or finding your Republican birthday
 - Tap or click any day for its old-style (Gregorian) date
 - French or English interface, toggle anywhere
-- Small and medium widgets for the iPhone Home Screen, macOS Notification Center, and desktop (the medium size includes the dial)
+- Small and medium widgets for the iPhone Home Screen, StandBy, macOS Notification Center, and desktop (the medium size includes the dial), with a bar that fills live through the decimal hour
+- Lock Screen widgets on iPhone: a round dial, a rectangle with the time, date and dedication, and an inline line above the clock
+- Widgets follow the app's language and theme through a shared app group
 - Conventional time at the bottom, for the unconverted
 
 ## Building for iPhone
@@ -27,6 +31,8 @@ The iPhone app and Home Screen widget need full Xcode 15 or newer; Command Line 
 2. Select the `HorlogeRepublicaine-iOS` target, then choose your Apple Development team under **Signing & Capabilities**. Use the same team for `HorlogeWidget-iOS`.
 3. Choose an iPhone simulator or connected iPhone and run the `HorlogeRepublicaine-iOS` scheme.
 4. After launching once, touch and hold the Home Screen, choose **Edit → Add Widget**, and search for **Horloge Républicaine**.
+
+The app and widget share settings through the app group `group.com.estonianspy.horloge-republicaine`, so your team needs the App Groups capability (Xcode adds it under Signing & Capabilities). Without it, remove the two `.entitlements` lines from the targets and the widget falls back to the system language and appearance.
 
 The simulator does not need a signing identity. A physical iPhone must be trusted, have Developer Mode enabled, and use bundle identifiers available to your development team.
 
@@ -40,6 +46,8 @@ open "build/Horloge Républicaine.app"
 ```
 
 Pure SwiftUI, with zero third-party dependencies.
+
+build.sh signs with your Apple Development identity if it finds one, and sets up a team-prefixed app group (`TEAMID.horloge-republicaine`) so the widget can read the app's language and theme. macOS doesn't need a provisioning profile for that.
 
 ## How the calendar is computed
 

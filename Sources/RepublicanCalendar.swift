@@ -1,5 +1,14 @@
 import Foundation
 
+enum Language: String {
+    case fr, en
+}
+
+// Tiny bilingual helper: tr(lang, "français", "english")
+func tr(_ lang: Language, _ fr: String, _ en: String) -> String {
+    lang == .fr ? fr : en
+}
+
 struct RepublicanDate {
     let year: Int        // An I = 1792-93
     let month: Int       // 0-11, or 12 for the complementary days
@@ -16,6 +25,74 @@ struct RepublicanDate {
     var ruralDayName: String? {
         isComplementary ? nil : RepublicanData.ruralDays[month * 30 + (day - 1)]
     }
+
+    var yearText: String { "An \(RepublicanCalendar.roman(year))" }
+
+    var republicanDay: RepublicanDay { RepublicanDay(month: month, day: day) }
+}
+
+// One day of the Republican year, independent of which year it falls in.
+// All the display strings live here so every screen words them the same way.
+struct RepublicanDay: Hashable {
+    let month: Int  // 0-11, or 12 for the complementary days
+    let day: Int
+
+    var isComplementary: Bool { month == 12 }
+
+    // "Quartidi 24 Vendémiaire", or "Fête du Génie"
+    var title: String {
+        isComplementary
+            ? RepublicanData.complementaryDays[day - 1]
+            : "\(RepublicanData.decadeDays[(day - 1) % 10]) \(day) \(RepublicanData.months[month])"
+    }
+
+    // "24 Vendémiaire", or "Fête du Génie"
+    var shortTitle: String {
+        isComplementary ? RepublicanData.complementaryDays[day - 1] : "\(day) \(RepublicanData.months[month])"
+    }
+
+    var isDecadi: Bool { !isComplementary && day % 10 == 0 }
+
+    var ruralFR: String? {
+        isComplementary ? nil : RepublicanData.ruralDays[month * 30 + day - 1]
+    }
+
+    var ruralEN: String? {
+        isComplementary ? nil : RepublicanData.ruralDaysEN[month * 30 + day - 1]
+    }
+
+    // What the day is consecrated to. English shows the translation with the
+    // French after it, unless the two are the same word ("Amaryllis").
+    func dedication(_ lang: Language) -> String? {
+        if isComplementary {
+            return lang == .en ? RepublicanData.complementaryDaysEN[day - 1] : nil
+        }
+        guard let fr = ruralFR, let en = ruralEN else { return nil }
+        if lang == .fr { return fr }
+        return Self.same(fr, en) ? en : "\(en) · \(fr)"
+    }
+
+    // The English name alone, or nil when it would only repeat the French.
+    var distinctEnglish: String? {
+        guard let fr = ruralFR, let en = ruralEN, !Self.same(fr, en) else { return nil }
+        return en
+    }
+
+    // Offset from 1 Vendémiaire.
+    var dayOfYear: Int { isComplementary ? 360 + day - 1 : month * 30 + day - 1 }
+
+    func gregorianDate(yearStart: Date) -> Date {
+        RepublicanCalendar.localGregorianCalendar.date(byAdding: .day, value: dayOfYear, to: yearStart)!
+    }
+
+    private static func same(_ a: String, _ b: String) -> Bool {
+        a.compare(b, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame
+    }
+}
+
+extension DecimalTime {
+    var text: String { String(format: "%d:%02d:%02d", hours, minutes, seconds) }
+    var shortText: String { String(format: "%d:%02d", hours, minutes) }
 }
 
 struct DecimalTime {

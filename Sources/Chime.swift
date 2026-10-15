@@ -22,7 +22,7 @@ final class ChimeController {
     func start() {
         guard !isStarted else { return }
         isStarted = true
-        UserDefaults.standard.register(defaults: ["chime": true])
+        AppGroup.defaults.register(defaults: ["chime": true])
         scheduleNext()
     }
 
@@ -70,7 +70,7 @@ final class ChimeController {
     }
 
     private func ring() {
-        guard UserDefaults.standard.bool(forKey: "chime") else { return }
+        guard AppGroup.defaults.bool(forKey: "chime") else { return }
         play(notes: Self.marseillaise)
     }
 

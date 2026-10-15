@@ -4,6 +4,14 @@ import SwiftUI
 // Widgets are snapshots, not live views. iOS coalesces very frequent entries,
 // so the timeline advances every five decimal minutes. That is 7m12s on a
 // normal day and automatically scales on 23/25-hour DST transition days.
+// The hour bar in between is a ProgressView(timerInterval:), which the
+// system animates live without extra entries.
+//
+// Each timeline runs to the end of the decimal hour and then asks for a new
+// one: about ten reloads a day, well inside the budget. The app also asks
+// for a reload when the language or appearance changes, but WidgetKit can
+// refuse that (the simulator does), so this caps how long a change takes to
+// show up at one decimal hour.
 
 struct DecimalEntry: TimelineEntry {
     let date: Date
@@ -23,8 +31,16 @@ struct DecimalProvider: TimelineProvider {
         var cursor = now
         var entries = [DecimalEntry(date: cursor)]
 
-        while entries.count < 72 {
-            let calendar = RepublicanCalendar.localGregorianCalendar
+        // End of this decimal hour, or the next one if this one is nearly over.
+        let calendar = RepublicanCalendar.localGregorianCalendar
+        let today = calendar.startOfDay(for: now)
+        let decimalHour = calendar.date(byAdding: .day, value: 1, to: today)!.timeIntervalSince(today) / 10
+        var horizon = today.addingTimeInterval((floor(now.timeIntervalSince(today) / decimalHour) + 1) * decimalHour)
+        if horizon.timeIntervalSince(now) < decimalHour / 5 {
+            horizon = horizon.addingTimeInterval(decimalHour)
+        }
+
+        while cursor < horizon && entries.count < 72 {
             let dayStart = calendar.startOfDay(for: cursor)
             let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
             let fiveDecimalMinutes = dayEnd.timeIntervalSince(dayStart) / 200
@@ -47,92 +63,204 @@ struct DecimalProvider: TimelineProvider {
             entries.append(DecimalEntry(date: next))
             cursor = next
         }
-        completion(Timeline(entries: entries, policy: .atEnd))
+        completion(Timeline(entries: entries, policy: .after(horizon)))
     }
 }
 
 struct DecimalWidgetView: View {
     @Environment(\.widgetFamily) private var family
+    @Environment(\.colorScheme) private var systemScheme
     let entry: DecimalEntry
 
-    // No app group, so the widget cannot read the app's language setting.
-    // It follows the system language instead.
-    private var isFrench: Bool {
-        Locale.current.language.languageCode?.identifier == "fr"
+    // Language and appearance come from the app through the app group. If
+    // the group is missing, follow the system.
+    private var lang: Language {
+        if let raw = AppGroup.defaults.string(forKey: "language"), let lang = Language(rawValue: raw) {
+            return lang
+        }
+        return Locale.current.language.languageCode?.identifier == "fr" ? .fr : .en
+    }
+
+    private var scheme: ColorScheme {
+        let appearance = Appearance(rawValue: AppGroup.defaults.string(forKey: "appearance") ?? "") ?? .auto
+        return appearance.colorScheme ?? systemScheme
     }
 
     var body: some View {
-        let dec = RepublicanCalendar.decimalTime(for: entry.date)
-
         switch family {
+#if os(iOS)
+        case .accessoryCircular:
+            circular
+                .containerBackground(for: .widget) { AccessoryWidgetBackground() }
+        case .accessoryRectangular:
+            rectangular
+                .containerBackground(for: .widget) { Color.clear }
+        case .accessoryInline:
+            inline
+                .containerBackground(for: .widget) { Color.clear }
+#endif
         case .systemMedium:
-            GeometryReader { proxy in
-                let dialSize = min(proxy.size.height, proxy.size.width * 0.39)
-                HStack(spacing: 14) {
-                    DecimalClockFace(dayFraction: dec.dayFraction)
-                        .frame(width: dialSize, height: dialSize)
-                        .accessibilityHidden(true)
-                    dateBlock(timeSize: 32)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+            medium
+                .environment(\.colorScheme, scheme)
+                .containerBackground(for: .widget) { Palette.for(scheme).parchment.color }
         default:
-            dateBlock(timeSize: 28)
+            small
+                .environment(\.colorScheme, scheme)
+                .containerBackground(for: .widget) { Palette.for(scheme).parchment.color }
         }
     }
 
-    private func dateBlock(timeSize: Double) -> some View {
-        let rep = RepublicanCalendar.date(from: entry.date)
-        let dec = RepublicanCalendar.decimalTime(for: entry.date)
+    private var rep: RepublicanDate { RepublicanCalendar.date(from: entry.date) }
+    private var dec: DecimalTime { RepublicanCalendar.decimalTime(for: entry.date) }
 
-        return VStack(spacing: 3) {
-            Text(String(format: "%d:%02d", dec.hours, dec.minutes))
-                .font(.system(size: timeSize, weight: .medium, design: .serif).monospacedDigit())
-                .foregroundStyle(Theme.ink)
-                .minimumScaleFactor(0.8)
+    // The current decimal hour, for the live bar.
+    private var hourInterval: ClosedRange<Date> {
+        let calendar = RepublicanCalendar.localGregorianCalendar
+        let start = calendar.startOfDay(for: entry.date)
+        let hour = calendar.date(byAdding: .day, value: 1, to: start)!.timeIntervalSince(start) / 10
+        let hourStart = start.addingTimeInterval(Double(dec.hours) * hour)
+        return hourStart...hourStart.addingTimeInterval(hour)
+    }
 
-            if rep.isComplementary {
-                Text(RepublicanData.complementaryDays[rep.day - 1])
-                    .font(.system(size: 12, weight: .semibold, design: .serif))
-                    .foregroundStyle(Theme.ink)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-            } else {
-                Text("\(rep.decadeDayName) \(rep.day) \(RepublicanData.months[rep.month])")
-                    .font(.system(size: 12, weight: .semibold, design: .serif))
-                    .foregroundStyle(Theme.ink)
-                    .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.7)
-            }
+    private var hourBar: some View {
+        ProgressView(timerInterval: hourInterval, countsDown: false) {
+            EmptyView()
+        } currentValueLabel: {
+            EmptyView()
+        }
+        .progressViewStyle(.linear)
+        .tint(Theme.blue)
+    }
 
-            Text("An \(RepublicanCalendar.roman(rep.year))")
-                .font(.system(size: 10, design: .serif))
+    private var timeLine: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 2) {
+            DidotTime(text: dec.shortText, size: 36)
+            Text("h")
+                .font(.didot(14))
                 .foregroundStyle(Theme.gold)
+        }
+    }
 
-            if let rural = rep.ruralDayName {
-                Text(isFrench
-                     ? "✿ \(rural)"
-                     : "✿ \(RepublicanData.ruralDaysEN[rep.month * 30 + rep.day - 1])")
-                    .font(.system(size: 10, design: .serif).italic())
+    private var dedicationText: String? {
+        if rep.isComplementary {
+            return lang == .en ? RepublicanData.complementaryDaysEN[rep.day - 1] : nil
+        }
+        return lang == .fr ? rep.republicanDay.ruralFR : rep.republicanDay.ruralEN
+    }
+
+    private var small: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            timeLine
+            hourBar
+                .padding(.top, 6)
+            Spacer(minLength: 4)
+            Text(rep.republicanDay.title)
+                .font(.didot(15))
+                .foregroundStyle(Theme.ink)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+            Text(rep.yearText.uppercased())
+                .font(.system(size: 9, weight: .medium))
+                .tracking(1)
+                .foregroundStyle(Theme.gold)
+                .padding(.top, 2)
+            if let dedication = dedicationText {
+                Text(dedication)
+                    .font(.didot(13, italic: true))
                     .foregroundStyle(Theme.red)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
+                    .padding(.top, 2)
             }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
+
+    private var medium: some View {
+        HStack(spacing: 16) {
+            DecimalClockFace(time: dec, style: .compact)
+                .aspectRatio(1, contentMode: .fit)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 5) {
+                timeLine
+                hourBar
+                Text(rep.republicanDay.title)
+                    .font(.didot(16))
+                    .foregroundStyle(Theme.ink)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .padding(.top, 2)
+                Text(rep.yearText.uppercased())
+                    .font(.system(size: 9.5, weight: .medium))
+                    .tracking(1.2)
+                    .foregroundStyle(Theme.gold)
+                if let dedication = dedicationText {
+                    Text("✿ \(dedication)")
+                        .font(.didot(13, italic: true))
+                        .foregroundStyle(Theme.red)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+#if os(iOS)
+    private var circular: some View {
+        DecimalClockFace(time: dec, style: .accessory)
+            .padding(2)
+            .widgetAccentable()
+            .accessibilityLabel(dec.shortText)
+    }
+
+    private var rectangular: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(dec.shortText)
+                    .font(.didot(22, bold: true))
+                    .widgetAccentable()
+                Text(tr(lang, "décimal", "decimal"))
+                    .font(.system(size: 11, weight: .medium))
+                    .opacity(0.7)
+            }
+            Text(rep.republicanDay.shortTitle)
+                .font(.system(size: 14, weight: .semibold))
+                .lineLimit(1)
+            if let dedication = dedicationText {
+                Text("✿ \(dedication)")
+                    .font(.system(size: 13))
+                    .opacity(0.75)
+                    .lineLimit(1)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var inline: some View {
+        Text("\(rep.republicanDay.shortTitle) · \(dec.shortText)")
+    }
+#endif
 }
 
 struct RepublicanWidget: Widget {
+    private var families: [WidgetFamily] {
+#if os(iOS)
+        [.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular, .accessoryInline]
+#else
+        [.systemSmall, .systemMedium]
+#endif
+    }
+
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "RepublicanClock", provider: DecimalProvider()) { entry in
             DecimalWidgetView(entry: entry)
-                .containerBackground(Theme.parchment, for: .widget)
                 .widgetURL(URL(string: "horloge-republicaine://clock"))
         }
         .configurationDisplayName("Horloge Républicaine")
         .description("L'heure décimale et le calendrier républicain.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies(families)
     }
 }
 

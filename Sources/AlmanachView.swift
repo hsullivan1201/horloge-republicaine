@@ -11,7 +11,7 @@ struct AlmanachView: View {
         case converter
     }
 
-    @AppStorage("language") private var languageRaw = Language.fr.rawValue
+    @AppStorage("language", store: AppGroup.defaults) private var languageRaw = Language.fr.rawValue
     @State private var selection: Page? = .system
 
     private var lang: Language { Language(rawValue: languageRaw) ?? .fr }
@@ -42,6 +42,7 @@ struct AlmanachView: View {
                         Label(tr(lang, "Le convertisseur", "The converter"), systemImage: "arrow.left.arrow.right")
                     }
                 }
+                .listRowBackground(Theme.cell)
 
                 Section(tr(lang, "Les mois", "The months")) {
                     ForEach(0..<12, id: \.self) { month in
@@ -50,7 +51,7 @@ struct AlmanachView: View {
                         } label: {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(RepublicanData.months[month])
-                                    .font(.system(size: 16, weight: .medium, design: .serif))
+                                    .font(.didot(19))
                                 Text(lang == .fr
                                      ? RepublicanData.monthMeanings[month]
                                      : RepublicanData.monthTranslations[month])
@@ -60,6 +61,7 @@ struct AlmanachView: View {
                         }
                     }
                 }
+                .listRowBackground(Theme.cell)
             }
             .scrollContentBackground(.hidden)
             .background(Theme.parchment)
@@ -108,10 +110,9 @@ struct AlmanachView: View {
             .background(Theme.parchment)
         }
         .modifier(AlmanachContainerLayout())
-        .preferredColorScheme(.light)
         .toolbar {
             ToolbarItem(placement: .automatic) {
-                Picker("", selection: $languageRaw) {
+                Picker("", selection: settingBinding($languageRaw)) {
                     Text("FR").tag(Language.fr.rawValue)
                     Text("EN").tag(Language.en.rawValue)
                 }
@@ -138,7 +139,7 @@ struct AlmanachView: View {
     }
 
     private var languagePicker: some View {
-        Picker("", selection: $languageRaw) {
+        Picker("", selection: settingBinding($languageRaw)) {
             Text("FR").tag(Language.fr.rawValue)
             Text("EN").tag(Language.en.rawValue)
         }
@@ -236,7 +237,7 @@ private struct PageTitle: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(text)
-                .font(.system(size: 26, weight: .semibold, design: .serif))
+                .font(.didot(32))
                 .foregroundStyle(Theme.ink)
             if let subtitle {
                 Text(subtitle)
@@ -800,26 +801,13 @@ private struct ConverterPage: View {
                 .foregroundStyle(Theme.red)
         } else {
             VStack(alignment: .leading, spacing: 2) {
-                if rep.isComplementary {
-                    Text("\(RepublicanData.complementaryDays[rep.day - 1]) · An \(RepublicanCalendar.roman(rep.year))")
-                        .font(.system(size: 15, weight: .semibold, design: .serif))
-                        .foregroundStyle(Theme.blue)
-                    if lang == .en {
-                        Text(RepublicanData.complementaryDaysEN[rep.day - 1])
-                            .font(.system(size: 12, design: .serif).italic())
-                            .foregroundStyle(Theme.red)
-                    }
-                } else {
-                    Text("\(rep.decadeDayName) \(rep.day) \(RepublicanData.months[rep.month]) · An \(RepublicanCalendar.roman(rep.year))")
-                        .font(.system(size: 15, weight: .semibold, design: .serif))
-                        .foregroundStyle(Theme.blue)
-                    if let rural = rep.ruralDayName {
-                        Text(lang == .fr
-                             ? "✿ \(rural)"
-                             : "✿ \(RepublicanData.ruralDaysEN[rep.month * 30 + rep.day - 1]) · \(rural)")
-                            .font(.system(size: 12, design: .serif).italic())
-                            .foregroundStyle(Theme.red)
-                    }
+                Text("\(rep.republicanDay.title) · \(rep.yearText)")
+                    .font(.didot(18))
+                    .foregroundStyle(Theme.blue)
+                if let dedication = rep.republicanDay.dedication(lang) {
+                    Text(rep.isComplementary ? dedication : "✿ \(dedication)")
+                        .font(.system(size: 12, design: .serif).italic())
+                        .foregroundStyle(Theme.red)
                 }
             }
         }
@@ -829,22 +817,15 @@ private struct ConverterPage: View {
     private var republicanToGregorianResult: some View {
         if let date = RepublicanCalendar.gregorianDate(year: repYear, month: repMonth, day: repDay) {
             VStack(alignment: .leading, spacing: 2) {
+                let target = RepublicanDay(month: repMonth, day: repDay)
                 Text(formatter.string(from: date))
-                    .font(.system(size: 15, weight: .semibold, design: .serif))
+                    .font(.didot(18))
                     .foregroundStyle(Theme.blue)
-                if repMonth == 12 {
-                    Text(lang == .fr
-                         ? RepublicanData.complementaryDays[repDay - 1]
-                         : RepublicanData.complementaryDaysEN[repDay - 1])
-                        .font(.system(size: 12, design: .serif).italic())
-                        .foregroundStyle(Theme.red)
-                } else {
-                    Text(lang == .fr
-                         ? "✿ \(RepublicanData.ruralDays[repMonth * 30 + repDay - 1])"
-                         : "✿ \(RepublicanData.ruralDaysEN[repMonth * 30 + repDay - 1]) · \(RepublicanData.ruralDays[repMonth * 30 + repDay - 1])")
-                        .font(.system(size: 12, design: .serif).italic())
-                        .foregroundStyle(Theme.red)
-                }
+                Text(target.isComplementary
+                     ? (lang == .fr ? target.title : target.dedication(.en) ?? target.title)
+                     : "✿ \(target.dedication(lang) ?? "")")
+                    .font(.system(size: 12, design: .serif).italic())
+                    .foregroundStyle(Theme.red)
             }
         }
     }
