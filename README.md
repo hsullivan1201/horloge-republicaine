@@ -41,9 +41,14 @@ The simulator does not need a signing identity. A physical iPhone must be truste
 You only need the Xcode command line tools (just `swiftc`, no Xcode project):
 
 ```sh
-./build.sh
-open "build/Horloge Républicaine.app"
+./build.sh install
 ```
+
+That builds the app and moves it to `/Applications/HorlogeRepublicaine.app`. Plain `./build.sh` only builds it into `build/`. Install by moving rather than copying: if macOS knows about two copies, the widget may launch from the wrong one.
+
+The folder name has no accent on purpose. With the é in the path, macOS can't find the widget extension and it never shows up in the widget gallery. Finder and the Dock still show "Horloge Républicaine".
+
+The icon is drawn in code by `Icon/make-mac-icon.swift` (`swift Icon/make-mac-icon.swift` rebuilds `Icon/AppIcon.icns`).
 
 Pure SwiftUI, with zero third-party dependencies.
 

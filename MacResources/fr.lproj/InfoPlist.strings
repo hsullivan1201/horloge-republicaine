@@ -1,0 +1,5 @@
+/* Finder and the Dock show this instead of the bundle's folder name,
+   which stays ASCII: ExtensionKit cannot find a widget inside a path
+   with a precomposed accent. */
+CFBundleDisplayName = "Horloge Républicaine";
+CFBundleName = "Horloge Républicaine";
