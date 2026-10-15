@@ -1,0 +1,565 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B1B2B3B40000000000000001 /* CalendarData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000001 /* CalendarData.swift */; };
+		B1B2B3B40000000000000002 /* RepublicanCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000002 /* RepublicanCalendar.swift */; };
+		B1B2B3B40000000000000003 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000003 /* Theme.swift */; };
+		B1B2B3B40000000000000004 /* Chime.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000004 /* Chime.swift */; };
+		B1B2B3B40000000000000005 /* AlmanachView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000005 /* AlmanachView.swift */; };
+		B1B2B3B40000000000000006 /* HorlogeMobileApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000006 /* HorlogeMobileApp.swift */; };
+		B1B2B3B40000000000000007 /* MobileViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000007 /* MobileViews.swift */; };
+		B1B2B3B40000000000000008 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000008 /* Assets.xcassets */; };
+		B1B2B3B40000000000000009 /* CalendarData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000001 /* CalendarData.swift */; };
+		B1B2B3B4000000000000000A /* RepublicanCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000002 /* RepublicanCalendar.swift */; };
+		B1B2B3B4000000000000000B /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000003 /* Theme.swift */; };
+		B1B2B3B4000000000000000C /* HorlogeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000009 /* HorlogeWidget.swift */; };
+		B1B2B3B4000000000000000D /* HorlogeWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = F1F2F3F4000000000000000B /* HorlogeWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B1B2B3B4000000000000000E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1F2F3F4000000000000000E /* AVFoundation.framework */; };
+		B1B2B3B4000000000000000F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1F2F3F4000000000000000F /* SwiftUI.framework */; };
+		B1B2B3B40000000000000010 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000010 /* WidgetKit.framework */; };
+		B1B2B3B40000000000000011 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F1F2F3F40000000000000011 /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		222222220000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 111111110000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E1E2E3E40000000000000002;
+			remoteInfo = "HorlogeWidget-iOS";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D1D2D3D40000000000000004 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B1B2B3B4000000000000000D /* HorlogeWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		F1F2F3F40000000000000001 /* CalendarData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarData.swift; sourceTree = "<group>"; };
+		F1F2F3F40000000000000002 /* RepublicanCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepublicanCalendar.swift; sourceTree = "<group>"; };
+		F1F2F3F40000000000000003 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		F1F2F3F40000000000000004 /* Chime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chime.swift; sourceTree = "<group>"; };
+		F1F2F3F40000000000000005 /* AlmanachView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlmanachView.swift; sourceTree = "<group>"; };
+		F1F2F3F40000000000000006 /* HorlogeMobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorlogeMobileApp.swift; sourceTree = "<group>"; };
+		F1F2F3F40000000000000007 /* MobileViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileViews.swift; sourceTree = "<group>"; };
+		F1F2F3F40000000000000008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F1F2F3F40000000000000009 /* HorlogeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorlogeWidget.swift; sourceTree = "<group>"; };
+		F1F2F3F4000000000000000A /* Horloge Républicaine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Horloge Républicaine.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1F2F3F4000000000000000B /* HorlogeWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HorlogeWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1F2F3F4000000000000000C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F1F2F3F4000000000000000D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F1F2F3F4000000000000000E /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		F1F2F3F4000000000000000F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		F1F2F3F40000000000000010 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		F1F2F3F40000000000000011 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D1D2D3D40000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1B2B3B4000000000000000E /* AVFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1D2D3D40000000000000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1B2B3B4000000000000000F /* SwiftUI.framework in Frameworks */,
+				B1B2B3B40000000000000010 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C1C2C3C40000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				C1C2C3C40000000000000002 /* Sources */,
+				C1C2C3C40000000000000003 /* Mobile */,
+				C1C2C3C40000000000000004 /* Widget */,
+				C1C2C3C40000000000000005 /* MobileWidget */,
+				C1C2C3C40000000000000007 /* Frameworks */,
+				C1C2C3C40000000000000006 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C1C2C3C40000000000000002 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				F1F2F3F40000000000000005 /* AlmanachView.swift */,
+				F1F2F3F40000000000000001 /* CalendarData.swift */,
+				F1F2F3F40000000000000004 /* Chime.swift */,
+				F1F2F3F40000000000000002 /* RepublicanCalendar.swift */,
+				F1F2F3F40000000000000003 /* Theme.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		C1C2C3C40000000000000003 /* Mobile */ = {
+			isa = PBXGroup;
+			children = (
+				F1F2F3F40000000000000008 /* Assets.xcassets */,
+				F1F2F3F40000000000000006 /* HorlogeMobileApp.swift */,
+				F1F2F3F4000000000000000C /* Info.plist */,
+				F1F2F3F40000000000000007 /* MobileViews.swift */,
+				F1F2F3F40000000000000011 /* PrivacyInfo.xcprivacy */,
+			);
+			path = Mobile;
+			sourceTree = "<group>";
+		};
+		C1C2C3C40000000000000004 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				F1F2F3F40000000000000009 /* HorlogeWidget.swift */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		C1C2C3C40000000000000005 /* MobileWidget */ = {
+			isa = PBXGroup;
+			children = (
+				F1F2F3F4000000000000000D /* Info.plist */,
+			);
+			path = MobileWidget;
+			sourceTree = "<group>";
+		};
+		C1C2C3C40000000000000006 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F1F2F3F4000000000000000A /* Horloge Républicaine.app */,
+				F1F2F3F4000000000000000B /* HorlogeWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C1C2C3C40000000000000007 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F1F2F3F4000000000000000E /* AVFoundation.framework */,
+				F1F2F3F4000000000000000F /* SwiftUI.framework */,
+				F1F2F3F40000000000000010 /* WidgetKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E1E2E3E40000000000000001 /* HorlogeRepublicaine-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 444444440000000000000002 /* Build configuration list for PBXNativeTarget "HorlogeRepublicaine-iOS" */;
+			buildPhases = (
+				D1D2D3D40000000000000001 /* Sources */,
+				D1D2D3D40000000000000002 /* Frameworks */,
+				D1D2D3D40000000000000003 /* Resources */,
+				D1D2D3D40000000000000004 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				333333330000000000000001 /* PBXTargetDependency */,
+			);
+			name = "HorlogeRepublicaine-iOS";
+			productName = HorlogeRepublicaine;
+			productReference = F1F2F3F4000000000000000A /* Horloge Républicaine.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E1E2E3E40000000000000002 /* HorlogeWidget-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 444444440000000000000003 /* Build configuration list for PBXNativeTarget "HorlogeWidget-iOS" */;
+			buildPhases = (
+				D1D2D3D40000000000000005 /* Sources */,
+				D1D2D3D40000000000000006 /* Frameworks */,
+				D1D2D3D40000000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "HorlogeWidget-iOS";
+			productName = HorlogeWidget;
+			productReference = F1F2F3F4000000000000000B /* HorlogeWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		111111110000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					E1E2E3E40000000000000001 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					E1E2E3E40000000000000002 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 444444440000000000000001 /* Build configuration list for PBXProject "HorlogeRepublicaine" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C1C2C3C40000000000000001;
+			productRefGroup = C1C2C3C40000000000000006 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E1E2E3E40000000000000001 /* HorlogeRepublicaine-iOS */,
+				E1E2E3E40000000000000002 /* HorlogeWidget-iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D1D2D3D40000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1B2B3B40000000000000008 /* Assets.xcassets in Resources */,
+				B1B2B3B40000000000000011 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1D2D3D40000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D1D2D3D40000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1B2B3B40000000000000005 /* AlmanachView.swift in Sources */,
+				B1B2B3B40000000000000001 /* CalendarData.swift in Sources */,
+				B1B2B3B40000000000000004 /* Chime.swift in Sources */,
+				B1B2B3B40000000000000006 /* HorlogeMobileApp.swift in Sources */,
+				B1B2B3B40000000000000007 /* MobileViews.swift in Sources */,
+				B1B2B3B40000000000000002 /* RepublicanCalendar.swift in Sources */,
+				B1B2B3B40000000000000003 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1D2D3D40000000000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1B2B3B40000000000000009 /* CalendarData.swift in Sources */,
+				B1B2B3B4000000000000000C /* HorlogeWidget.swift in Sources */,
+				B1B2B3B4000000000000000A /* RepublicanCalendar.swift in Sources */,
+				B1B2B3B4000000000000000B /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		333333330000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E1E2E3E40000000000000002 /* HorlogeWidget-iOS */;
+			targetProxy = 222222220000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A1A2A3A40000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A1A2A3A40000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A1A2A3A40000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Mobile/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.estonianspy.horloge-republicaine";
+				PRODUCT_MODULE_NAME = HorlogeRepublicaine;
+				PRODUCT_NAME = "Horloge Républicaine";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A1A2A3A40000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Mobile/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.estonianspy.horloge-republicaine";
+				PRODUCT_MODULE_NAME = HorlogeRepublicaine;
+				PRODUCT_NAME = "Horloge Républicaine";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A1A2A3A40000000000000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MobileWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.estonianspy.horloge-republicaine.widget";
+				PRODUCT_MODULE_NAME = HorlogeWidget;
+				PRODUCT_NAME = HorlogeWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A1A2A3A40000000000000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MobileWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.estonianspy.horloge-republicaine.widget";
+				PRODUCT_MODULE_NAME = HorlogeWidget;
+				PRODUCT_NAME = HorlogeWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		444444440000000000000001 /* Build configuration list for PBXProject "HorlogeRepublicaine" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1A2A3A40000000000000001 /* Debug */,
+				A1A2A3A40000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		444444440000000000000002 /* Build configuration list for PBXNativeTarget "HorlogeRepublicaine-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1A2A3A40000000000000003 /* Debug */,
+				A1A2A3A40000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		444444440000000000000003 /* Build configuration list for PBXNativeTarget "HorlogeWidget-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1A2A3A40000000000000005 /* Debug */,
+				A1A2A3A40000000000000006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 111111110000000000000001 /* Project object */;
+}

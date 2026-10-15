@@ -1,8 +1,8 @@
 import AVFoundation
 import Foundation
 
-// Rings a synthesized bell at each new decimal hour (every 2 h 24 of old
-// time). At decimal noon (5:00) it plays the opening of La Marseillaise.
+// Plays the opening of La Marseillaise on synthesized bells at each new
+// decimal hour (every 2 h 24 of old time).
 // Bells are generated in code: a fundamental with two decaying overtones,
 // no sound files needed.
 final class ChimeController {
@@ -13,12 +13,15 @@ final class ChimeController {
     private let sampleRate = 44_100.0
     private var timer: Timer?
     private var activePlays = 0
+    private var isStarted = false
 
     private init() {}
 
     private var isSetUp = false
 
     func start() {
+        guard !isStarted else { return }
+        isStarted = true
         UserDefaults.standard.register(defaults: ["chime": true])
         scheduleNext()
     }
@@ -26,6 +29,12 @@ final class ChimeController {
     private func setUpIfNeeded() {
         guard !isSetUp else { return }
         isSetUp = true
+#if os(iOS)
+        // Keep previews polite on iPhone: mix with music and obey the silent
+        // switch instead of taking over the device's audio session.
+        let session = AVAudioSession.sharedInstance()
+        try? session.setCategory(.ambient, mode: .default)
+#endif
         let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1)
         engine.attach(player)
         engine.connect(player, to: engine.mainMixerNode, format: format)
@@ -39,7 +48,7 @@ final class ChimeController {
 
     private func scheduleNext() {
         let now = Date()
-        let calendar = Calendar.current
+        let calendar = RepublicanCalendar.localGregorianCalendar
         let dayStart = calendar.startOfDay(for: now)
         let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
         let dayLength = dayEnd.timeIntervalSince(dayStart)
@@ -90,6 +99,11 @@ final class ChimeController {
     private func play(notes: [Note]) {
         setUpIfNeeded()
         guard let buffer = render(notes) else { return }
+#if os(iOS)
+        // Reactivate for every play so previews recover after calls, alarms,
+        // route changes, or another audio-session interruption.
+        try? AVAudioSession.sharedInstance().setActive(true)
+#endif
         if !engine.isRunning {
             do { try engine.start() } catch { return }
         }
@@ -101,6 +115,12 @@ final class ChimeController {
                 if self.activePlays <= 0 {
                     self.activePlays = 0
                     self.engine.pause()
+#if os(iOS)
+                    try? AVAudioSession.sharedInstance().setActive(
+                        false,
+                        options: .notifyOthersOnDeactivation
+                    )
+#endif
                 }
             }
         }

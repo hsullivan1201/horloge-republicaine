@@ -27,10 +27,15 @@ swiftc -O -parse-as-library -target arm64-apple-macos14.0 \
     -o "$APPEX/Contents/MacOS/HorlogeWidget"
 cp Widget/Info.plist "$APPEX/Contents/Info.plist"
 
-# Extensions only load if they are sandboxed and signed (ad hoc is fine
-# locally). Sign inside-out: appex first, then the app.
-codesign --force -s - --entitlements Widget/widget.entitlements "$APPEX"
-codesign --force -s - "$APP"
+# Extensions only load if they are sandboxed and signed with a real
+# identity: the widget gallery (chronod) silently ignores ad-hoc signed
+# extensions. Sign inside-out: appex first, then the app. Falls back to
+# ad hoc if no Apple Development identity is in the keychain.
+IDENTITY=$(security find-identity -v -p codesigning | grep -om1 '"Apple Development: [^"]*"' | tr -d '"')
+[ -n "$IDENTITY" ] || IDENTITY="-"
+echo "Signing as: $IDENTITY"
+codesign --force -s "$IDENTITY" --entitlements Widget/widget.entitlements "$APPEX"
+codesign --force -s "$IDENTITY" "$APP"
 
 echo "Built $APP"
 echo "Run it with: open \"$APP\""

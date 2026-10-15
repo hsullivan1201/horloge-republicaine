@@ -27,12 +27,23 @@ struct DecimalTime {
 
 enum RepublicanCalendar {
 
+    // The Republican conversion is defined against Gregorian September 22.
+    // Calendar.current can be Buddhist, Hebrew, Islamic, etc. on iOS, so using
+    // it directly would move the Republican year for users who select a
+    // non-Gregorian system calendar. Keep the user's live time zone while
+    // making the calendar system explicit.
+    static var localGregorianCalendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .autoupdatingCurrent
+        return calendar
+    }
+
     // Each Republican year is anchored to September 22, the Gregorian date of
     // the original 1 Vendémiaire An I (and still where the autumn equinox
     // falls, give or take a day). Anchoring to the Gregorian date keeps the
     // math simple and self-consistent: years spanning a February 29 naturally
     // get a 6th complementary day.
-    static func date(from date: Date, calendar: Calendar = .current) -> RepublicanDate {
+    static func date(from date: Date, calendar: Calendar = localGregorianCalendar) -> RepublicanDate {
         let today = calendar.startOfDay(for: date)
         let year = calendar.component(.year, from: date)
 
@@ -56,7 +67,7 @@ enum RepublicanCalendar {
     }
 
     // 10 hours per day, 100 minutes per hour, 100 seconds per minute.
-    static func decimalTime(for date: Date, calendar: Calendar = .current) -> DecimalTime {
+    static func decimalTime(for date: Date, calendar: Calendar = localGregorianCalendar) -> DecimalTime {
         let start = calendar.startOfDay(for: date)
         let end = calendar.date(byAdding: .day, value: 1, to: start)!
         let fraction = date.timeIntervalSince(start) / end.timeIntervalSince(start)
@@ -70,13 +81,23 @@ enum RepublicanCalendar {
     }
 
     // Reverse conversion: a Republican date to its Gregorian equivalent.
-    static func gregorianDate(year: Int, month: Int, day: Int, calendar: Calendar = .current) -> Date? {
-        guard year >= 1, let start = anniversary(of: 1791 + year, calendar: calendar) else { return nil }
+    static func gregorianDate(year: Int, month: Int, day: Int, calendar: Calendar = localGregorianCalendar) -> Date? {
+        guard year >= 1,
+              (0...12).contains(month),
+              day >= 1,
+              let start = anniversary(of: 1791 + year, calendar: calendar)
+        else { return nil }
+
+        let maxDay = month == 12
+            ? (isLeapRepublicanYear(year, calendar: calendar) ? 6 : 5)
+            : 30
+        guard day <= maxDay else { return nil }
+
         let offset = month == 12 ? 360 + day - 1 : month * 30 + day - 1
         return calendar.date(byAdding: .day, value: offset, to: start)
     }
 
-    static func isLeapRepublicanYear(_ year: Int, calendar: Calendar = .current) -> Bool {
+    static func isLeapRepublicanYear(_ year: Int, calendar: Calendar = localGregorianCalendar) -> Bool {
         guard let start = anniversary(of: 1791 + year, calendar: calendar),
               let next = anniversary(of: 1792 + year, calendar: calendar) else { return false }
         return calendar.dateComponents([.day], from: start, to: next).day == 366

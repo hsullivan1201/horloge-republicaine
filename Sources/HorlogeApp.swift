@@ -109,11 +109,6 @@ struct DayInfoPopover: View {
                     .foregroundStyle(Theme.red)
             }
 
-            if let plate = Engravings.plate(month: month, day: day) {
-                EngravingView(plate: plate, lang: lang)
-                    .padding(.top, 2)
-            }
-
             Divider()
 
             Text(tr(lang, "ancien style : ", "old style: ") + formatter.string(from: gregorian))

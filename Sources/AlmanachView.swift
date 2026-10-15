@@ -17,6 +17,58 @@ struct AlmanachView: View {
     private var lang: Language { Language(rawValue: languageRaw) ?? .fr }
 
     var body: some View {
+#if os(iOS)
+        NavigationStack {
+            List {
+                Section {
+                    NavigationLink {
+                        mobileDetail(.system)
+                    } label: {
+                        Label(tr(lang, "Le système", "The system"), systemImage: "clock")
+                    }
+                    NavigationLink {
+                        mobileDetail(.decade)
+                    } label: {
+                        Label(tr(lang, "La décade", "The décade"), systemImage: "10.circle")
+                    }
+                    NavigationLink {
+                        mobileDetail(.complementary)
+                    } label: {
+                        Label("Sans-culottides", systemImage: "sparkles")
+                    }
+                    NavigationLink {
+                        mobileDetail(.converter)
+                    } label: {
+                        Label(tr(lang, "Le convertisseur", "The converter"), systemImage: "arrow.left.arrow.right")
+                    }
+                }
+
+                Section(tr(lang, "Les mois", "The months")) {
+                    ForEach(0..<12, id: \.self) { month in
+                        NavigationLink {
+                            mobileDetail(.month(month))
+                        } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(RepublicanData.months[month])
+                                    .font(.system(size: 16, weight: .medium, design: .serif))
+                                Text(lang == .fr
+                                     ? RepublicanData.monthMeanings[month]
+                                     : RepublicanData.monthTranslations[month])
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(Theme.parchment)
+            .navigationTitle(tr(lang, "Almanach", "Almanac"))
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) { languagePicker }
+            }
+        }
+#else
         NavigationSplitView {
             List(selection: $selection) {
                 Section {
@@ -50,13 +102,12 @@ struct AlmanachView: View {
                     case .converter: ConverterPage(lang: lang)
                     }
                 }
-                .frame(maxWidth: 560, alignment: .leading)
-                .padding(28)
+                .modifier(AlmanachPageLayout())
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Theme.parchment)
         }
-        .frame(minWidth: 700, minHeight: 480)
+        .modifier(AlmanachContainerLayout())
         .preferredColorScheme(.light)
         .toolbar {
             ToolbarItem(placement: .automatic) {
@@ -68,6 +119,106 @@ struct AlmanachView: View {
                 .frame(width: 90)
             }
         }
+#endif
+    }
+
+#if os(iOS)
+    private func mobileDetail(_ page: Page) -> some View {
+        ScrollView {
+            pageContent(page)
+                .modifier(AlmanachPageLayout())
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Theme.parchment.ignoresSafeArea())
+        .navigationTitle(pageTitle(page))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) { languagePicker }
+        }
+    }
+
+    private var languagePicker: some View {
+        Picker("", selection: $languageRaw) {
+            Text("FR").tag(Language.fr.rawValue)
+            Text("EN").tag(Language.en.rawValue)
+        }
+        .pickerStyle(.segmented)
+        .frame(width: 90)
+    }
+
+    @ViewBuilder
+    private func pageContent(_ page: Page) -> some View {
+        switch page {
+        case .system: SystemPage(lang: lang)
+        case .decade: DecadePage(lang: lang)
+        case .month(let month): MonthPage(lang: lang, month: month)
+        case .complementary: ComplementaryPage(lang: lang)
+        case .converter: ConverterPage(lang: lang)
+        }
+    }
+
+    private func pageTitle(_ page: Page) -> String {
+        switch page {
+        case .system: return tr(lang, "Le système", "The system")
+        case .decade: return tr(lang, "La décade", "The décade")
+        case .month(let month): return RepublicanData.months[month]
+        case .complementary: return "Sans-culottides"
+        case .converter: return tr(lang, "Le convertisseur", "The converter")
+        }
+    }
+#endif
+}
+
+private struct AlmanachPageLayout: ViewModifier {
+    func body(content: Content) -> some View {
+#if os(macOS)
+        content
+            .frame(maxWidth: 560, alignment: .leading)
+            .padding(28)
+#else
+        content
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 20)
+#endif
+    }
+}
+
+private struct AlmanachContainerLayout: ViewModifier {
+    func body(content: Content) -> some View {
+#if os(macOS)
+        content.frame(minWidth: 700, minHeight: 480)
+#else
+        content
+#endif
+    }
+}
+
+private struct AlmanachControlRow<Leading: View, Trailing: View>: View {
+    let leading: Leading
+    let trailing: Trailing
+
+    init(
+        @ViewBuilder leading: () -> Leading,
+        @ViewBuilder trailing: () -> Trailing
+    ) {
+        self.leading = leading()
+        self.trailing = trailing()
+    }
+
+    var body: some View {
+#if os(iOS)
+        VStack(alignment: .leading, spacing: 8) {
+            leading
+            trailing
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+#else
+        HStack(spacing: 8) {
+            leading
+            trailing
+        }
+#endif
     }
 }
 
@@ -359,7 +510,10 @@ private struct ConverterPage: View {
     init(lang: Language) {
         self.lang = lang
         let now = Date()
-        let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: now)
+        let comps = RepublicanCalendar.localGregorianCalendar.dateComponents(
+            [.year, .month, .day, .hour, .minute],
+            from: now
+        )
         let today = RepublicanCalendar.date(from: now)
         let dec = RepublicanCalendar.decimalTime(for: now)
         _gregDay = State(initialValue: comps.day!)
@@ -407,14 +561,14 @@ private struct ConverterPage: View {
     }
 
     private var gregMaxDay: Int {
-        let calendar = Calendar.current
+        let calendar = RepublicanCalendar.localGregorianCalendar
         let anchor = calendar.date(from: DateComponents(year: gregYear, month: gregMonth))!
         return calendar.range(of: .day, in: .month, for: anchor)!.count
     }
 
     // Noon, so DST shifts can't nudge the day.
     private var gregorianInput: Date {
-        Calendar.current.date(from: DateComponents(
+        RepublicanCalendar.localGregorianCalendar.date(from: DateComponents(
             year: gregYear, month: gregMonth, day: min(gregDay, gregMaxDay), hour: 12
         ))!
     }
@@ -439,70 +593,92 @@ private struct ConverterPage: View {
                 """))
 
             converterPanel(title: tr(lang, "Ancien style → républicain", "Old style → Republican")) {
-                HStack(spacing: 8) {
-                    Picker("", selection: $gregDay) {
-                        ForEach(1...gregMaxDay, id: \.self) { d in
-                            Text("\(d)").tag(d)
+                AlmanachControlRow {
+                    HStack(spacing: 8) {
+                        Picker("", selection: $gregDay) {
+                            ForEach(1...gregMaxDay, id: \.self) { d in
+                                Text("\(d)").tag(d)
+                            }
                         }
-                    }
-                    .labelsHidden()
-                    .frame(width: 64)
+                        .labelsHidden()
+                        .frame(width: 64)
 
-                    Picker("", selection: $gregMonth) {
-                        ForEach(1...12, id: \.self) { m in
-                            Text((lang == .fr ? Self.monthSymbolsFR : Self.monthSymbolsEN)[m - 1]).tag(m)
+                        Picker("", selection: $gregMonth) {
+                            ForEach(1...12, id: \.self) { m in
+                                Text((lang == .fr ? Self.monthSymbolsFR : Self.monthSymbolsEN)[m - 1]).tag(m)
+                            }
                         }
+                        .labelsHidden()
+                        .frame(width: 150)
                     }
-                    .labelsHidden()
-                    .frame(width: 150)
-
+                } trailing: {
                     Stepper(value: $gregYear, in: 1792...3000) {
                         Text(String(gregYear))
                             .font(.system(size: 13, design: .serif))
                             .foregroundStyle(Theme.ink)
                     }
                 }
+#if os(iOS)
+                .onChange(of: gregMonth) { _, _ in
+                    gregDay = min(gregDay, gregMaxDay)
+                }
+                .onChange(of: gregYear) { _, _ in
+                    gregDay = min(gregDay, gregMaxDay)
+                }
+#else
                 .onChange(of: gregMonth) { _ in
                     gregDay = min(gregDay, gregMaxDay)
                 }
                 .onChange(of: gregYear) { _ in
                     gregDay = min(gregDay, gregMaxDay)
                 }
+#endif
 
                 gregorianToRepublicanResult
             }
 
             converterPanel(title: tr(lang, "Républicain → ancien style", "Republican → old style")) {
-                HStack(spacing: 8) {
-                    Picker("", selection: $repDay) {
-                        ForEach(1...maxDay, id: \.self) { d in
-                            Text("\(d)").tag(d)
+                AlmanachControlRow {
+                    HStack(spacing: 8) {
+                        Picker("", selection: $repDay) {
+                            ForEach(1...maxDay, id: \.self) { d in
+                                Text("\(d)").tag(d)
+                            }
                         }
-                    }
-                    .labelsHidden()
-                    .frame(width: 64)
+                        .labelsHidden()
+                        .frame(width: 64)
 
-                    Picker("", selection: $repMonth) {
-                        ForEach(0..<12, id: \.self) { m in
-                            Text(RepublicanData.months[m]).tag(m)
+                        Picker("", selection: $repMonth) {
+                            ForEach(0..<12, id: \.self) { m in
+                                Text(RepublicanData.months[m]).tag(m)
+                            }
+                            Text("Sans-culottides").tag(12)
                         }
-                        Text("Sans-culottides").tag(12)
+                        .labelsHidden()
+                        .frame(width: 150)
                     }
-                    .labelsHidden()
-                    .frame(width: 150)
-
+                } trailing: {
                     Stepper(value: $repYear, in: 1...3000) {
                         Text("An \(RepublicanCalendar.roman(repYear))")
                             .font(.system(size: 13, design: .serif))
                             .foregroundStyle(Theme.ink)
                     }
                 }
+#if os(iOS)
+                .onChange(of: repMonth) { _, _ in
+                    repDay = min(repDay, maxDay)
+                }
+                .onChange(of: repYear) { _, _ in
+                    repDay = min(repDay, maxDay)
+                }
+#else
                 .onChange(of: repMonth) { _ in
                     repDay = min(repDay, maxDay)
                 }
                 .onChange(of: repYear) { _ in
                     repDay = min(repDay, maxDay)
                 }
+#endif
 
                 republicanToGregorianResult
             }
