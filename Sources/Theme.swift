@@ -240,6 +240,10 @@ struct DecimalClockFace: View {
 
     let time: DecimalTime
     var style: Style = .full
+    // For widgets that iOS renders tinted or clear: everything in white at
+    // varying opacity, no filled face. A filled face would turn into a solid
+    // white disc there and swallow the numerals and hands.
+    var monochrome = false
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
@@ -255,8 +259,9 @@ struct DecimalClockFace: View {
         let s = radius / 147
         let p = Palette.for(scheme)
         let accessory = style == .accessory
-        let ink = accessory ? Color.white : p.ink.color
-        let gold = accessory ? Color.white.opacity(0.55) : p.gold.color
+        let mono = accessory || monochrome
+        let ink = mono ? Color.white : p.ink.color
+        let gold = mono ? Color.white.opacity(0.55) : p.gold.color
 
         func pt(_ angle: Double, _ r: Double) -> CGPoint {
             CGPoint(x: center.x + cos(angle) * r * s, y: center.y + sin(angle) * r * s)
@@ -269,6 +274,9 @@ struct DecimalClockFace: View {
         // Face and rims
         if accessory {
             context.stroke(circle(140), with: .color(.white.opacity(0.45)), lineWidth: 7 * s)
+        } else if monochrome {
+            context.fill(circle(147), with: .color(.white.opacity(0.08)))
+            context.stroke(circle(146), with: .color(.white.opacity(0.9)), lineWidth: 3 * s)
         } else {
             context.fill(circle(147), with: .radialGradient(
                 Gradient(colors: [p.face.color, p.face.color.opacity(scheme == .dark ? 1 : 0.82)]),
@@ -337,8 +345,8 @@ struct DecimalClockFace: View {
         }
 
         // Hands
-        let hourColor = accessory ? Color.white : p.hand.color
-        let minuteColor = accessory ? Color.white.opacity(0.8) : ink
+        let hourColor = mono ? Color.white : p.hand.color
+        let minuteColor = mono ? Color.white.opacity(0.8) : ink
         let minuteTurns = (time.dayFraction * 10).truncatingRemainder(dividingBy: 1)
 
         // Breguet hour hand: shaft, hollow "pomme" near the tip, short point.
@@ -404,7 +412,7 @@ struct DecimalClockFace: View {
         // Hub
         let hub: Double = style == .full ? 5 : 10
         context.fill(circle(hub), with: .color(hourColor))
-        context.fill(circle(hub * 0.35), with: .color(accessory ? .black : p.red.color))
+        context.fill(circle(hub * 0.35), with: .color(mono ? .black : p.red.color))
     }
 }
 

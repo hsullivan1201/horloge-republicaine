@@ -7,8 +7,8 @@ import SwiftUI
 // The hour bar in between is a ProgressView(timerInterval:), which the
 // system animates live without extra entries.
 //
-// Each timeline runs to the end of the decimal hour and then asks for a new
-// one: about ten reloads a day, well inside the budget. The app also asks
+// Each timeline asks for a new one at the end of the decimal hour: about
+// ten reloads a day, well inside the budget. The app also asks
 // for a reload when the language or appearance changes, but WidgetKit can
 // refuse that (the simulator does), so this caps how long a change takes to
 // show up at one decimal hour.
@@ -40,7 +40,9 @@ struct DecimalProvider: TimelineProvider {
             horizon = horizon.addingTimeInterval(decimalHour)
         }
 
-        while cursor < horizon && entries.count < 72 {
+        // Entries run on past the horizon (six hours in all) so the clock
+        // keeps moving if the system is slow to grant the reload.
+        while entries.count < 72 {
             let dayStart = calendar.startOfDay(for: cursor)
             let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
             let fiveDecimalMinutes = dayEnd.timeIntervalSince(dayStart) / 200
@@ -70,6 +72,7 @@ struct DecimalProvider: TimelineProvider {
 struct DecimalWidgetView: View {
     @Environment(\.widgetFamily) private var family
     @Environment(\.colorScheme) private var systemScheme
+    @Environment(\.widgetRenderingMode) private var renderingMode
     let entry: DecimalEntry
 
     // Language and appearance come from the app through the app group. If
@@ -178,7 +181,7 @@ struct DecimalWidgetView: View {
 
     private var medium: some View {
         HStack(spacing: 16) {
-            DecimalClockFace(time: dec, style: .compact)
+            DecimalClockFace(time: dec, style: .compact, monochrome: renderingMode != .fullColor)
                 .aspectRatio(1, contentMode: .fit)
                 .accessibilityHidden(true)
 
